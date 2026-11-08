@@ -212,6 +212,10 @@ button { cursor: pointer; }
 .segmento { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; background: #f2f2f5; padding: 4px; border-radius: 14px; }
 .segmento button { min-height: 44px; border: 0; border-radius: 10px; background: transparent; font-weight: 600; font-size: 0.9em; }
 .segmento button[aria-pressed='true'] { background: #fff; box-shadow: 0 1px 3px rgba(22, 22, 29, 0.12); color: var(--c-marca-texto); }
+.mesa-qr { display: flex; align-items: center; gap: 14px; margin-top: 14px; padding: 14px; border-radius: 16px; background: var(--c-acento-suave); font-size: 0.9em; line-height: 1.4; }
+.mesa-qr .mesa-num { width: 52px; height: 52px; flex: none; border-radius: 14px; display: grid; place-items: center; background: var(--c-marca); color: var(--c-sobre-marca); font: 800 24px/1 var(--fuente-carta); animation: pop 0.4s cubic-bezier(0.3, 1.8, 0.5, 1); }
+.mesa-qr.sin { background: #f2f2f5; }
+.mesa-qr.sin svg { flex: none; color: var(--c-marca-texto); }
 .linea-item { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; padding: 12px 0; border-bottom: 1px solid #ececf0; align-items: center; }
 .total { display: flex; justify-content: space-between; font-weight: 800; font-size: 1.1em; margin-top: 14px; }
 .toast { position: fixed; left: 50%; top: 16px; transform: translateX(-50%); z-index: 50; display: flex; align-items: center; gap: 10px; max-width: calc(100vw - 32px); background: #16161d; color: #fff; padding: 10px 16px 10px 10px; border-radius: 999px; font-size: 14px; font-weight: 600; box-shadow: 0 12px 30px rgba(0, 0, 0, 0.25); animation: toast 0.45s cubic-bezier(0.3, 1.4, 0.5, 1); }
@@ -298,3 +302,6 @@ button { cursor: pointer; }
 .s-info { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 24px; }
 .s-info h3 { margin: 0 0 6px; font-size: 16px; }
 .s-info p { margin: 0; color: #55555f; line-height: 1.5; }
+
+.qr-probar { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; margin-top: 10px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--c-marca-texto); color: var(--c-marca-texto); font-weight: 700; font-size: 13px; text-decoration: none; }
+@media print { .no-imprimir { display: none !important; } }

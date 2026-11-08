@@ -49,6 +49,7 @@ export function QrMesas({ slug }: { slug: string }) {
             <img src={src} alt={`QR de la mesa ${i + 1}`} />
             <div style={{ fontFamily: 'var(--fuente-carta)', fontWeight: 800, fontSize: 26, color: 'var(--c-marca-texto)' }}>Mesa {i + 1}</div>
             <div style={{ fontSize: 13, color: '#55555f' }}>Escaneá para ver la carta y pedir</div>
+            <Link className="no-imprimir qr-probar" href={`/d/${config.slug}?mesa=${i + 1}`}>Probar como mesa {i + 1}</Link>
           </div>
         ))}
       </div>

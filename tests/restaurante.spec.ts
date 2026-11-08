@@ -152,3 +152,20 @@ test('la landing registra un cliente y aparece en el panel', async ({ page, requ
   await page.getByRole('button', { name: `Ver demo de ${nombre}` }).click();
   await expect(page.getByRole('heading', { level: 1, name: nombre })).toBeVisible();
 });
+
+test('la mesa solo sale del QR: sin QR no se puede elegir una mesa a mano', async ({ page }) => {
+  await crearDemo(page);
+  await page.getByRole('button', { name: /Sumar Pasta al pesto/ }).click();
+  await page.getByRole('button', { name: /Ver pedido · 1/ }).click();
+  await expect(page.getByRole('button', { name: 'Para llevar' })).toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: 'En la mesa' }).click();
+  await expect(page.getByText('Escaneá el QR de tu mesa')).toBeVisible();
+  await expect(page.getByRole('combobox')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: /Enviar pedido por WhatsApp/ })).toBeDisabled();
+  await page.goto('/d/cafe-la-esquina-azul/qr');
+  await page.getByRole('link', { name: 'Probar como mesa 3' }).click();
+  await page.getByRole('button', { name: /Sumar Pasta al pesto/ }).click();
+  await page.getByRole('button', { name: /Ver pedido · 1/ }).click();
+  await expect(page.getByText('Tomada del QR de tu mesa')).toBeVisible();
+  await expect(page.getByRole('button', { name: /Enviar pedido por WhatsApp/ })).toBeEnabled();
+});

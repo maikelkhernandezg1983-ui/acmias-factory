@@ -356,7 +356,8 @@ function HojaCarrito({ lineas, setLineas, mesaInicial, onCerrar, onEnviado, conf
     ...(config.delivery ? [{ id: 'delivery' as const, nombre: 'Delivery' }] : []),
   ];
   const [modo, setModo] = useState<ModoServicio>(mesaInicial ? 'mesa' : 'llevar');
-  const [mesa, setMesa] = useState(mesaInicial ?? 1);
+  // La mesa solo sale del QR: así el pedido queda atado a la mesa donde está sentado el cliente.
+  const mesa = mesaInicial;
   const [direccion, setDireccion] = useState('');
   const [nombre, setNombre] = useState('');
   const [error, setError] = useState('');
@@ -369,6 +370,10 @@ function HojaCarrito({ lineas, setLineas, mesaInicial, onCerrar, onEnviado, conf
   }
 
   function enviar() {
+    if (modo === 'mesa' && !mesa) {
+      setError('Escaneá el QR de tu mesa para pedir desde la mesa.');
+      return;
+    }
     if (modo === 'delivery' && direccion.trim().length < 5) {
       setError('Escribí la dirección de entrega.');
       return;
@@ -409,10 +414,17 @@ function HojaCarrito({ lineas, setLineas, mesaInicial, onCerrar, onEnviado, conf
 
         {modo === 'mesa' && (
           <>
-            <label className="c-lbl" htmlFor="mesa">Mesa</label>
-            <select id="mesa" className="c-inp" value={mesa} onChange={(e) => setMesa(Number(e.target.value))}>
-              {Array.from({ length: config.mesas }, (_, i) => i + 1).map((n) => <option key={n} value={n}>Mesa {n}</option>)}
-            </select>
+            {mesa ? (
+              <div className="mesa-qr" role="note">
+                <span className="mesa-num">{mesa}</span>
+                <span><strong>Mesa {mesa}</strong><br />Tomada del QR de tu mesa. El mozo te lo lleva ahí.</span>
+              </div>
+            ) : (
+              <div className="mesa-qr sin" role="note">
+                <Icono nombre="qr" size={26} />
+                <span><strong>Escaneá el QR de tu mesa</strong><br />Está en la mesa. Así el pedido llega a tu mesa sin errores.</span>
+              </div>
+            )}
           </>
         )}
         {modo === 'delivery' && (
@@ -427,7 +439,7 @@ function HojaCarrito({ lineas, setLineas, mesaInicial, onCerrar, onEnviado, conf
 
         {modo === 'delivery' && <div style={{ display: 'flex', justifyContent: 'space-between', marginTop: 14 }}><span>Envío</span><span>{p(envio)}</span></div>}
         <div className="total"><span>Total</span><span>{p(subtotal + envio)}</span></div>
-        <button type="button" className="c-cta" onClick={enviar} disabled={lineas.length === 0}>
+        <button type="button" className="c-cta" onClick={enviar} disabled={lineas.length === 0 || (modo === 'mesa' && !mesa)}>
           <Icono nombre="whatsapp" /> Enviar pedido por WhatsApp
         </button>
         <p style={{ fontSize: '0.78em', color: '#6a6a74', textAlign: 'center', margin: '10px 0 0' }}>Se abre WhatsApp con tu pedido escrito. El local lo confirma por ahí.</p>
