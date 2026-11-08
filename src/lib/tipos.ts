@@ -57,6 +57,8 @@ export interface Pedido {
 export interface DemoConfig {
   slug: string;
   rubro: 'restaurante';
+  /** Registro del cliente (formulario de la web) del que salió la demo. */
+  registroId?: string;
   negocio: string;
   logo?: string;
   colorPrincipal: string;

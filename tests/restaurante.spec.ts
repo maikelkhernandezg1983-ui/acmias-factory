@@ -125,3 +125,30 @@ test('mesa fuera de rango se ignora', async ({ page }) => {
   await page.goto('/d/cafe-la-esquina-azul?mesa=99');
   await expect(page.getByText('Carta digital')).toBeVisible();
 });
+
+test('el vendedor abre la demo de un cliente registrado con un toque', async ({ page }) => {
+  await page.goto('/');
+  await page.getByRole('button', { name: 'Ver demo de Trattoria Don Bruno' }).click();
+  await expect(page.getByRole('heading', { level: 1, name: 'Trattoria Don Bruno' })).toBeVisible();
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: 'Ver demo de Trattoria Don Bruno' })).toHaveText('Abrir su demo');
+  await page.getByRole('button', { name: 'Ver demo de Trattoria Don Bruno' }).click();
+  await expect(page).toHaveURL(/trattoria-don-bruno-[a-z0-9-]+$/);
+  await page.goto('/');
+  await expect(page.getByRole('button', { name: 'Ver demo de Repuestos Ruta 9' })).toBeDisabled();
+});
+
+test('la landing registra un cliente y aparece en el panel', async ({ page, request }) => {
+  const nombre = `Bodegón Prueba ${Date.now() % 100000}`;
+  const base = { negocio: nombre, rubro: 'restaurante', colorPrincipal: '#2a4d8f', colorSecundario: '#ffcc00', whatsapp: '+54 9 11 5555 9999', email: 'cliente@ejemplo.com', caso: 'Carta con QR', aceptaContacto: true };
+  const ajena = await request.post('/api/registros', { data: base, headers: { origin: 'https://otro-sitio.com' } });
+  expect(ajena.status()).toBe(403);
+  const sinAceptar = await request.post('/api/registros', { data: { ...base, aceptaContacto: false }, headers: { origin: 'https://acmias-landing-demo-bmhi.vercel.app' } });
+  expect(sinAceptar.status()).toBe(422);
+  const ok = await request.post('/api/registros', { data: base, headers: { origin: 'https://acmias-landing-demo-bmhi.vercel.app' } });
+  expect(ok.status()).toBe(201);
+  expect(ok.headers()['access-control-allow-origin']).toBe('https://acmias-landing-demo-bmhi.vercel.app');
+  await page.goto('/');
+  await page.getByRole('button', { name: `Ver demo de ${nombre}` }).click();
+  await expect(page.getByRole('heading', { level: 1, name: nombre })).toBeVisible();
+});

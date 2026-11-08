@@ -12,6 +12,7 @@ import { crearTema } from '@/lib/marca';
 import type { DemoConfig } from '@/lib/tipos';
 import { Icono } from '@/components/Icono';
 import { useDialogo } from '@/components/useDialogo';
+import { Registros } from './Registros';
 
 const RUBROS = [
   { id: 'restaurante', nombre: 'Restaurante', listo: true },
@@ -114,11 +115,13 @@ export function PanelVendedor() {
 
       <main className="acm-wrap">
         <div className="acm-titulo"><h1>Demos</h1></div>
-        <p className="acm-sub">Cargá los datos del cliente y abrí su demo con su logo y sus colores. Se guarda en este dispositivo.</p>
+        <p className="acm-sub">Elegí un cliente registrado y abrí su demo con su marca. Si todavía no se registró, cargalo a mano.</p>
+
+        <Registros />
 
         <div className="acm-grid">
           <form className="acm-card" onSubmit={crear} noValidate aria-labelledby="nueva-demo">
-            <h3 id="nueva-demo">Nueva demo</h3>
+            <h3 id="nueva-demo">Cargar a mano</h3>
 
             <div className="campo">
               <span className="lbl" id="lbl-rubro">Rubro</span>
