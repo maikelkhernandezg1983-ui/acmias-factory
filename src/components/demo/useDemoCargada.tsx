@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { guardarDemo, useDemo, useEstado } from '@/lib/almacen';
 import { crearTema, temaComoEstilo } from '@/lib/marca';
 import { decodificarConfig } from '@/lib/utiles';
+import { VERSION_DATOS, fotoEjemplo } from '@/lib/rubros/restaurante/datos-ejemplo';
 
 const sinSuscripcion = () => () => {};
 
@@ -27,6 +28,16 @@ export function useDemoCargada(slug: string) {
       }
     }
   }, [config, slug]);
+
+  // Demos creadas con datos de ejemplo viejos: suman las fotos sin tocar lo que cargó el dueño.
+  useEffect(() => {
+    if (!estado || (estado.version ?? 1) >= VERSION_DATOS) return;
+    actualizar((e) => ({
+      ...e,
+      version: VERSION_DATOS,
+      platos: e.platos.map((p) => (p.foto || p.importado ? p : { ...p, foto: fotoEjemplo(p.id) })),
+    }));
+  }, [estado, actualizar]);
 
   const tema = useMemo(() => (config ? crearTema(config.colorPrincipal, config.colorSecundario) : null), [config]);
   const estilo = useMemo(() => (tema ? (temaComoEstilo(tema) as React.CSSProperties) : undefined), [tema]);

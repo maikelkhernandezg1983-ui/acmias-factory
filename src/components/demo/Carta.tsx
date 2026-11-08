@@ -2,7 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from 'react';
 import { AvisoDemo, DemoNoEncontrada, useDemoCargada } from './useDemoCargada';
-import { Ilustracion } from '@/components/Ilustracion';
+import { FotoPlato } from './FotoPlato';
+import { FOTO_PORTADA } from '@/lib/rubros/restaurante/datos-ejemplo';
 import { Icono } from '@/components/Icono';
 import { useDialogo } from '@/components/useDialogo';
 import { ETIQUETAS, type ItemPedido, type ModoServicio, type Plato } from '@/lib/tipos';
@@ -24,9 +25,14 @@ export function Carta({ slug }: { slug: string }) {
   const [platoAbierto, setPlatoAbierto] = useState<Plato | null>(null);
   const [carrito, setCarrito] = useState<Linea[]>([]);
   const [verCarrito, setVerCarrito] = useState(false);
-  const [toast, setToast] = useState('');
+  const [toast, setToast] = useState<{ id: number; texto: string } | null>(null);
+  const [rebote, setRebote] = useState(0);
   const [ahora, setAhora] = useState<Date>(() => new Date());
+  const [portadaOk, setPortadaOk] = useState(true);
   const vistasRegistradas = useRef(new Set<string>());
+  const barraRef = useRef<HTMLButtonElement>(null);
+  const tabsRef = useRef<HTMLDivElement>(null);
+  const indicadorRef = useRef<HTMLSpanElement>(null);
 
   useEffect(() => {
     const t = setInterval(() => setAhora(new Date()), 60_000);
@@ -35,7 +41,7 @@ export function Carta({ slug }: { slug: string }) {
 
   useEffect(() => {
     if (!toast) return;
-    const t = setTimeout(() => setToast(''), 2200);
+    const t = setTimeout(() => setToast(null), 2200);
     return () => clearTimeout(t);
   }, [toast]);
 
@@ -48,11 +54,27 @@ export function Carta({ slug }: { slug: string }) {
         const vis = entradas.filter((e) => e.isIntersecting).sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
         if (vis[0]) setActivo(vis[0].target.id.replace('cat-', ''));
       },
-      { rootMargin: '-80px 0px -60% 0px' },
+      { rootMargin: '-120px 0px -60% 0px' },
     );
     secciones.forEach((s) => obs.observe(s));
     return () => obs.disconnect();
   }, [estado]);
+
+  const activoEf = activo || estado?.categorias[0]?.id || '';
+
+  // Indicador deslizante de la pestaña activa: sigue a la categoría y la mantiene a la vista.
+  useEffect(() => {
+    const cont = tabsRef.current;
+    const ind = indicadorRef.current;
+    if (!cont || !ind) return;
+    const tab = cont.querySelector<HTMLElement>(`[data-cat="${activoEf}"]`);
+    if (!tab) return;
+    ind.style.setProperty('--x', `${tab.offsetLeft}px`);
+    ind.style.setProperty('--w', `${tab.offsetWidth}px`);
+    ind.dataset.listo = '1';
+    const destino = tab.offsetLeft - (cont.clientWidth - tab.offsetWidth) / 2;
+    cont.scrollTo({ left: destino, behavior: 'smooth' });
+  }, [activoEf, grande]);
 
   const destacados = useMemo(() => estado?.platos.filter((p) => p.destacado && !p.agotado) ?? [], [estado]);
 
@@ -72,14 +94,16 @@ export function Carta({ slug }: { slug: string }) {
     }
   }
 
-  function agregar(plato: Plato, cantidad: number, nota: string) {
+  function agregar(plato: Plato, cantidad: number, nota: string, origen?: HTMLElement | null) {
     setCarrito((c) => {
       const i = c.findIndex((l) => l.platoId === plato.id && l.nota === nota);
       if (i >= 0) return c.map((l, j) => (j === i ? { ...l, cantidad: l.cantidad + cantidad } : l));
       return [...c, { clave: idCorto(), platoId: plato.id, nombre: plato.nombre, precio: plato.precio, cantidad, nota }];
     });
     setPlatoAbierto(null);
-    setToast(`Agregaste ${cantidad} × ${plato.nombre}`);
+    setToast({ id: Date.now(), texto: `Agregaste ${cantidad} × ${plato.nombre}` });
+    volarAlCarrito(origen ?? null, () => barraRef.current, () => setRebote((r) => r + 1));
+    if ('vibrate' in navigator) navigator.vibrate?.(12);
   }
 
   function toggleLetra() {
@@ -89,11 +113,24 @@ export function Carta({ slug }: { slug: string }) {
     });
   }
 
+  let indice = 0;
+
   return (
     <div className={`carta${grande ? ' grande' : ''}`} style={estilo}>
       <AvisoDemo />
-      <header className="c-head">
-        <div className="c-head-in">
+      <header className={`c-hero${portadaOk ? '' : ' sin-foto'}`}>
+        {portadaOk && (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img className="c-hero-foto" src={FOTO_PORTADA} alt="" fetchPriority="high" onError={() => setPortadaOk(false)} />
+        )}
+        <div className="c-hero-velo" aria-hidden="true" />
+        <div className="c-hero-in">
+          <div className="c-herr">
+            <span className="c-modo">{mesa ? `Mesa ${mesa}` : 'Carta digital'}</span>
+            <button type="button" className="c-btn-texto" onClick={toggleLetra} aria-pressed={grande}>
+              <Icono nombre="texto" size={18} /> {grande ? 'Letra normal' : 'Letra grande'}
+            </button>
+          </div>
           <div className="c-id">
             {config.logo ? (
               // eslint-disable-next-line @next/next/no-img-element
@@ -101,53 +138,46 @@ export function Carta({ slug }: { slug: string }) {
             ) : (
               <span className="c-inicial" aria-hidden="true">{config.negocio[0]?.toUpperCase()}</span>
             )}
-            <div>
+            <div className="c-id-txt">
               <h1 className="c-nombre">{config.negocio}</h1>
-              <span className="c-estado">
+              <span className={`c-estado${abierto ? ' abierto' : ''}`}>
                 <span className="punto" aria-hidden="true" />
                 {abierto ? `Abierto · cierra ${config.cierre}` : `Cerrado · abre ${config.apertura}`}
               </span>
             </div>
           </div>
-          <div className="c-herr">
-            <span className="c-modo">{mesa ? `Mesa ${mesa}` : 'Carta digital'}</span>
-            <button type="button" className="c-btn-texto" onClick={toggleLetra} aria-pressed={grande}>
-              <Icono nombre="texto" size={18} /> {grande ? 'Letra normal' : 'Letra grande'}
-            </button>
-          </div>
         </div>
-        <nav className="c-tabs" aria-label="Categorías">
-          <div className="c-tabs-in">
-            {estado.categorias.map((c) => (
-              <a key={c.id} href={`#cat-${c.id}`} className="c-tab" aria-current={activo === c.id}>
-                {c.nombre}
-              </a>
-            ))}
-          </div>
-        </nav>
       </header>
+
+      <nav className="c-tabs" aria-label="Categorías">
+        <div className="c-tabs-in" ref={tabsRef}>
+          <span className="c-tab-ind" ref={indicadorRef} aria-hidden="true" />
+          {estado.categorias.map((c) => (
+            <a key={c.id} href={`#cat-${c.id}`} data-cat={c.id} className="c-tab" aria-current={activoEf === c.id} onClick={() => setActivo(c.id)}>
+              {c.nombre}
+            </a>
+          ))}
+        </div>
+      </nav>
 
       <main className="c-main">
         {!abierto && (
-          <p role="status" style={{ background: '#fff4e5', padding: '12px 14px', borderRadius: 12, marginTop: 16, fontSize: '0.9em' }}>
-            Ahora estamos cerrados. Podés mirar la carta y pedir desde las {config.apertura}.
+          <p role="status" className="c-cerrado">
+            <Icono nombre="reloj" size={18} /> Ahora estamos cerrados. Podés mirar la carta y pedir desde las {config.apertura}.
           </p>
         )}
 
         {destacados.length > 0 && (
-          <section aria-labelledby="t-dest" style={{ paddingTop: 10 }}>
-            <h2 id="t-dest" className="sr-only">Recomendados de hoy</h2>
+          <section aria-labelledby="t-dest" className="c-dest-sec">
+            <h2 id="t-dest" className="c-dest-tit">Recomendados de hoy</h2>
             <div className="c-dest">
-              {destacados.map((d) => (
-                <button key={d.id} type="button" className="c-dest-card" onClick={() => abrirPlato(d)}>
-                  <div className="c-dest-img">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    {d.foto ? <img src={d.foto} alt="" /> : <Ilustracion tipo={d.ilustracion} />}
-                  </div>
-                  <div className="c-dest-txt">
+              {destacados.map((d, i) => (
+                <button key={d.id} type="button" className="c-dest-card" style={{ '--i': i } as React.CSSProperties} onClick={() => abrirPlato(d)}>
+                  <FotoPlato src={d.foto} tipo={d.ilustracion} className="c-dest-img" prioridad />
+                  <span className="c-dest-txt">
                     <strong>{d.nombre}</strong>
-                    <span style={{ fontWeight: 700 }}>{p(d.precio)}</span>
-                  </div>
+                    <span className="c-dest-precio">{p(d.precio)}</span>
+                  </span>
                 </button>
               ))}
             </div>
@@ -161,24 +191,33 @@ export function Carta({ slug }: { slug: string }) {
             <section key={c.id} id={`cat-${c.id}`} className="c-sec" aria-labelledby={`t-${c.id}`}>
               <h2 id={`t-${c.id}`}>{c.nombre}</h2>
               {platos.map((pl) => (
-                <button key={pl.id} type="button" className={`plato${pl.agotado ? ' agotado' : ''}`} onClick={() => abrirPlato(pl)} disabled={pl.agotado} aria-label={`${pl.nombre}, ${p(pl.precio)}${pl.agotado ? ', agotado' : ''}`}>
-                  <div>
-                    <div className="plato-nom">
-                      <span className="nombre">{pl.nombre}</span>
-                      <span className="puntos" aria-hidden="true" />
-                      <span className="precio">{p(pl.precio)}</span>
-                    </div>
-                    <p className="plato-desc">{pl.descripcion}</p>
-                    <div className="tags">
-                      {pl.agotado && <span className="tag agot">Agotado hoy</span>}
-                      {pl.etiquetas.map((t) => <span key={t} className="tag">{ETIQUETAS[t]}</span>)}
-                    </div>
-                  </div>
-                  <div className="plato-img">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    {pl.foto ? <img src={pl.foto} alt="" /> : <Ilustracion tipo={pl.ilustracion} />}
-                  </div>
-                </button>
+                <div key={pl.id} className={`plato${pl.agotado ? ' agotado' : ''}`} style={{ '--i': Math.min(indice++, 10) } as React.CSSProperties}>
+                  <button type="button" className="plato-abrir" onClick={() => abrirPlato(pl)} disabled={pl.agotado} aria-label={`${pl.nombre}, ${p(pl.precio)}${pl.agotado ? ', agotado' : ''}`}>
+                    <span className="plato-txt">
+                      <span className="plato-nom">
+                        <span className="nombre">{pl.nombre}</span>
+                        <span className="puntos" aria-hidden="true" />
+                        <span className="precio">{p(pl.precio)}</span>
+                      </span>
+                      <span className="plato-desc">{pl.descripcion}</span>
+                      <span className="tags">
+                        {pl.agotado && <span className="tag agot">Agotado hoy</span>}
+                        {pl.etiquetas.map((t) => <span key={t} className="tag">{ETIQUETAS[t]}</span>)}
+                      </span>
+                    </span>
+                    <FotoPlato src={pl.foto} tipo={pl.ilustracion} className="plato-img" />
+                  </button>
+                  {!pl.agotado && abierto && (
+                    <button
+                      type="button"
+                      className="plato-mas"
+                      aria-label={`Sumar ${pl.nombre} al pedido`}
+                      onClick={(e) => agregar(pl, 1, '', e.currentTarget.parentElement?.querySelector<HTMLElement>('.plato-img'))}
+                    >
+                      <Icono nombre="mas" size={20} />
+                    </button>
+                  )}
+                </div>
               ))}
             </section>
           );
@@ -193,8 +232,11 @@ export function Carta({ slug }: { slug: string }) {
 
       {cantidadTotal > 0 && (
         <div className="barra-carrito">
-          <button type="button" onClick={() => setVerCarrito(true)}>
-            <span style={{ display: 'flex', alignItems: 'center', gap: 10 }}><Icono nombre="carrito" /> Ver pedido · {cantidadTotal}</span>
+          <button type="button" ref={barraRef} onClick={() => setVerCarrito(true)} key={`b-${rebote}`} data-rebote={rebote > 0 ? '1' : undefined}>
+            <span className="barra-izq">
+              <span className="barra-icono"><Icono nombre="carrito" /><span className="barra-n" key={cantidadTotal}>{cantidadTotal}</span></span>
+              Ver pedido · {cantidadTotal}
+            </span>
             <span>{p(subtotal)}</span>
           </button>
         </div>
@@ -211,26 +253,67 @@ export function Carta({ slug }: { slug: string }) {
             const err = actualizar((e) => ({ ...e, pedidos: [pedido, ...e.pedidos] }));
             setCarrito([]);
             setVerCarrito(false);
-            setToast(err ? 'Pedido enviado. No se pudo guardar en el historial de este dispositivo.' : 'Pedido enviado por WhatsApp');
+            setToast({ id: Date.now(), texto: err ? 'Pedido enviado. No se pudo guardar en el historial de este dispositivo.' : 'Pedido enviado por WhatsApp' });
           }}
           config={config}
         />
       )}
-      {toast && <div className="toast" role="status">{toast}</div>}
+      {toast && (
+        <div className="toast" role="status" key={toast.id}>
+          <span className="toast-check" aria-hidden="true"><Icono nombre="check" size={16} /></span>
+          {toast.texto}
+        </div>
+      )}
     </div>
   );
 }
 
-function HojaPlato({ plato, moneda, onCerrar, onAgregar, abierto }: { plato: Plato; moneda: string; onCerrar: () => void; onAgregar: (p: Plato, c: number, n: string) => void; abierto: boolean }) {
+/** Animación "vuela al carrito": una copia de la foto viaja en arco hasta la barra del pedido. */
+function volarAlCarrito(origen: HTMLElement | null, destino: () => HTMLElement | null, alLlegar: () => void) {
+  const reducido = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if (!origen || reducido || typeof origen.animate !== 'function') {
+    alLlegar();
+    return;
+  }
+  // La copia se toma ya: el origen puede desaparecer (la hoja del plato se cierra al agregar).
+  const r = origen.getBoundingClientRect();
+  const copia = origen.cloneNode(true) as HTMLElement;
+  copia.classList.add('volando');
+  Object.assign(copia.style, { left: `${r.left}px`, top: `${r.top}px`, width: `${r.width}px`, height: `${r.height}px` });
+  document.body.appendChild(copia);
+  // El destino se mide en el cuadro siguiente: con el primer plato la barra recién aparece.
+  requestAnimationFrame(() => {
+    const d = destino()?.getBoundingClientRect();
+    const fx = d ? d.left + 38 : window.innerWidth / 2;
+    const fy = d ? d.top + d.height / 2 : window.innerHeight - 40;
+    const dx = fx - (r.left + r.width / 2);
+    const dy = fy - (r.top + r.height / 2);
+    const anim = copia.animate(
+      [
+        { transform: 'translate(0, 0) scale(1) rotate(0deg)', opacity: 1, borderRadius: '16px' },
+        { transform: `translate(${dx * 0.45}px, ${dy * 0.45 - 90}px) scale(0.55) rotate(-8deg)`, opacity: 1, offset: 0.5 },
+        { transform: `translate(${dx}px, ${dy}px) scale(0.12) rotate(6deg)`, opacity: 0.4, borderRadius: '50%' },
+      ],
+      { duration: 620, easing: 'cubic-bezier(0.5, 0, 0.75, 0.4)' },
+    );
+    anim.onfinish = () => {
+      copia.remove();
+      alLlegar();
+    };
+    anim.oncancel = () => copia.remove();
+  });
+}
+
+function HojaPlato({ plato, moneda, onCerrar, onAgregar, abierto }: { plato: Plato; moneda: string; onCerrar: () => void; onAgregar: (p: Plato, c: number, n: string, origen?: HTMLElement | null) => void; abierto: boolean }) {
   const [cantidad, setCantidad] = useState(1);
   const [nota, setNota] = useState('');
   const ref = useDialogo<HTMLDivElement>(onCerrar);
+  const fotoRef = useRef<HTMLDivElement>(null);
   return (
     <div className="hoja-fondo" onClick={(e) => e.target === e.currentTarget && onCerrar()}>
       <div className="hoja" role="dialog" aria-modal="true" aria-labelledby="t-plato" ref={ref}>
-        <div className="plato-img" style={{ width: '100%', height: 180, borderRadius: 16, marginBottom: 14 }}>
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          {plato.foto ? <img src={plato.foto} alt="" /> : <Ilustracion tipo={plato.ilustracion} />}
+        <div ref={fotoRef}>
+          <FotoPlato src={plato.foto} tipo={plato.ilustracion} className="hoja-foto" prioridad />
         </div>
         <div className="hoja-cab">
           <div>
@@ -249,7 +332,7 @@ function HojaPlato({ plato, moneda, onCerrar, onAgregar, abierto }: { plato: Pla
             <span aria-live="polite">{cantidad}</span>
             <button type="button" onClick={() => setCantidad((c) => Math.min(20, c + 1))} aria-label="Agregar uno"><Icono nombre="mas" /></button>
           </div>
-          <button type="button" className="c-cta" style={{ marginTop: 0 }} onClick={() => onAgregar(plato, cantidad, nota.trim())} disabled={!abierto}>
+          <button type="button" className="c-cta" style={{ marginTop: 0 }} onClick={() => onAgregar(plato, cantidad, nota.trim(), fotoRef.current?.querySelector<HTMLElement>('.hoja-foto'))} disabled={!abierto}>
             {abierto ? `Agregar · ${formatoPrecio(plato.precio * cantidad, moneda)}` : 'Cerrado ahora'}
           </button>
         </div>

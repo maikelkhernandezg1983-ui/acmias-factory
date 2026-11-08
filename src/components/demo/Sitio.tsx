@@ -2,7 +2,8 @@
 
 import Link from 'next/link';
 import { AvisoDemo, DemoNoEncontrada, useDemoCargada } from './useDemoCargada';
-import { Ilustracion } from '@/components/Ilustracion';
+import { FotoPlato } from './FotoPlato';
+import { FOTO_PORTADA } from '@/lib/rubros/restaurante/datos-ejemplo';
 import { Icono } from '@/components/Icono';
 import { enlaceWhatsApp, formatoPrecio } from '@/lib/utiles';
 
@@ -17,7 +18,7 @@ export function Sitio({ slug }: { slug: string }) {
   return (
     <div className="sitio" style={estilo}>
       <AvisoDemo />
-      <section className="s-hero">
+      <section className="s-hero" style={{ '--portada': `url(${FOTO_PORTADA})` } as React.CSSProperties}>
         <div className="s-in">
           <nav className="s-nav" aria-label="Principal">
             <span style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
@@ -46,10 +47,7 @@ export function Sitio({ slug }: { slug: string }) {
           <div className="s-grid">
             {muestra.map((p) => (
               <article key={p.id} className="s-plato">
-                <div className="img">
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  {p.foto ? <img src={p.foto} alt="" /> : <Ilustracion tipo={p.ilustracion} />}
-                </div>
+                <FotoPlato src={p.foto} tipo={p.ilustracion} className="img" />
                 <div className="t">
                   <strong style={{ fontFamily: 'var(--fuente-carta)', fontSize: 19, display: 'block' }}>{p.nombre}</strong>
                   <span style={{ color: '#55555f', fontSize: 14 }}>{p.descripcion}</span>

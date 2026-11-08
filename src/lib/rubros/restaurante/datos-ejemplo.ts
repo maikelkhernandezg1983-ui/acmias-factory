@@ -1,7 +1,7 @@
 import type { Categoria, DemoEstado, Pedido, Plato } from '@/lib/tipos';
 
 /** Versión de los datos de ejemplo. Subirla regenera las demos que no tengan cambios. */
-export const VERSION_DATOS = 1;
+export const VERSION_DATOS = 2;
 
 /**
  * Precios de ejemplo en una "unidad base" que se escala por moneda.
@@ -22,6 +22,36 @@ function redondear(v: number) {
 export function precioEjemplo(base: number, moneda: string) {
   return redondear(base * (FACTOR_MONEDA[moneda] ?? 1));
 }
+
+
+/**
+ * Fotos de ejemplo de Unsplash (licencia Unsplash: uso comercial libre, sin atribución obligatoria).
+ * Solo fotos verificadas como gratuitas (no Unsplash+). Si una no carga, la carta muestra la ilustración.
+ */
+const U = (id: string, w = 720) => `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}&q=70`;
+export const FOTO_PORTADA = U('photo-1749871615234-98bff62995ba', 1600);
+const FOTOS: Record<string, string> = {
+  p1: U('photo-1788172400221-6d7d417ee75f'),
+  p2: U('photo-1464500650248-1a4b45debb9f'),
+  p4: U('photo-1679449223735-444c4f71f0dd'),
+  p5: U('photo-1613769049987-b31b641f25b1'),
+  p6: U('photo-1637633801971-0b9231088347'),
+  p8: U('photo-1704283735270-f973e7e9c14e'),
+  p10: U('photo-1473093295043-cdd812d0e601'),
+  p11: U('photo-1522251253478-4cae03d93949'),
+  p12: U('photo-1542354254-d856f94968ea'),
+  p13: U('photo-1560971017-e22e6a4fbefd'),
+  p14: U('photo-1692737348416-0a4fa4cf1523'),
+  p16: U('photo-1687030047985-9e7fff0739b6'),
+  p17: U('photo-1597648152428-f883fbc9c873'),
+  p19: U('photo-1675576628703-dd13ee3f87b8'),
+  p20: U('photo-1600271886742-f049cd451bba'),
+  p21: U('photo-1704283735270-f973e7e9c14e'),
+  p22: U('photo-1788172400221-6d7d417ee75f'),
+};
+
+/** Foto de ejemplo para un plato de la carta de muestra (undefined si no tiene). */
+export const fotoEjemplo = (id: string): string | undefined => FOTOS[id];
 
 export const CATEGORIAS: Categoria[] = [
   { id: 'del-dia', nombre: 'Del día', ilustracion: 'plato' },
@@ -89,7 +119,7 @@ function pedidosDeEjemplo(platos: Plato[]): Pedido[] {
 }
 
 export function crearEstadoInicial(moneda: string): DemoEstado {
-  const platos: Plato[] = PLATOS.map(({ base, ...p }) => ({ ...p, precio: precioEjemplo(base, moneda) }));
+  const platos: Plato[] = PLATOS.map(({ base, ...p }) => ({ ...p, foto: FOTOS[p.id], precio: precioEjemplo(base, moneda) }));
   const vistas: Record<string, number> = { p1: 41, p13: 37, p2: 22, p8: 30, p21: 19, p10: 15, p16: 12, p5: 18, p12: 9 };
   return { version: VERSION_DATOS, categorias: CATEGORIAS, platos, pedidos: pedidosDeEjemplo(platos), vistas };
 }
