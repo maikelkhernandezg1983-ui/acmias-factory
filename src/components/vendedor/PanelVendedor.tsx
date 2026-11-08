@@ -23,7 +23,7 @@ const RUBROS = [
   { id: 'ferreteria', nombre: 'Ferretería', listo: false },
 ];
 
-export function PanelVendedor() {
+export function PanelVendedor({ usuario }: { usuario: string }) {
   const demos = useDemos();
   const router = useRouter();
   const [negocio, setNegocio] = useState('');
@@ -109,7 +109,20 @@ export function PanelVendedor() {
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src="/marca/logotipo-oscuro.png" alt="ACMIAS" height={22} style={{ height: 22, width: 'auto' }} />
           </Link>
-          <span className="chip">Panel del vendedor</span>
+          <span className="usuario-sesion">
+            <span className="chip">Vendedor: {usuario}</span>
+            <button
+              type="button"
+              className="btn btn-linea btn-chico"
+              onClick={async () => {
+                await fetch('/api/sesion', { method: 'DELETE' }).catch(() => null);
+                router.replace('/ingresar');
+                router.refresh();
+              }}
+            >
+              Salir
+            </button>
+          </span>
         </div>
       </header>
 

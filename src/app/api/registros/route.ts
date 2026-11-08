@@ -1,6 +1,6 @@
 import { NextResponse, type NextRequest } from 'next/server';
+import { vendedorActual } from '@/lib/sesion';
 import { crearRegistro, listarRegistros, MAX_LOGO, NuevoRegistro } from '@/lib/registros';
-import { COOKIE, panelBloqueadoSinClave, tokenValido } from '@/lib/sesion';
 
 /** Orígenes que pueden enviar solicitudes (la landing). Separados por coma en LANDING_ORIGENES. */
 const ORIGENES = (process.env.LANDING_ORIGENES ?? 'https://acmias-landing-demo-bmhi.vercel.app,https://acmias.com,https://www.acmias.com')
@@ -23,9 +23,9 @@ export function OPTIONS(req: NextRequest) {
   return new NextResponse(null, { status: 204, headers: cors(req.headers.get('origin')) });
 }
 
-export async function GET(req: NextRequest) {
-  if (panelBloqueadoSinClave()) return NextResponse.json({ error: 'Falta configurar PANEL_CLAVE en Vercel.' }, { status: 503 });
-  if (!tokenValido(req.cookies.get(COOKIE)?.value)) return NextResponse.json({ error: 'Ingresá la clave del panel.' }, { status: 401 });
+// GET solo llega con sesión de vendedor: lo controla src/proxy.ts.
+export async function GET() {
+  if (!(await vendedorActual())) return NextResponse.json({ error: 'Ingresá con tu usuario de vendedor.' }, { status: 401 });
   try {
     return NextResponse.json({ registros: await listarRegistros() }, { headers: { 'Cache-Control': 'no-store' } });
   } catch {

@@ -305,3 +305,17 @@ button { cursor: pointer; }
 
 .qr-probar { display: inline-flex; align-items: center; justify-content: center; min-height: 40px; margin-top: 10px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--c-marca-texto); color: var(--c-marca-texto); font-weight: 700; font-size: 13px; text-decoration: none; }
 @media print { .no-imprimir { display: none !important; } }
+
+/* Ingreso del vendedor */
+.ingreso { display: grid; place-items: center; padding: 24px; }
+.ingreso-caja { width: 100%; max-width: 420px; background: var(--acm-surface); border: 1px solid var(--acm-line); border-radius: var(--r-lg); padding: 32px 28px; }
+.ingreso-caja h1 { font: 800 28px/1.1 var(--fuente-carta); letter-spacing: -0.02em; margin: 22px 0 8px; }
+.ingreso-pie { color: var(--acm-muted); font-size: 13px; margin: 22px 0 0; line-height: 1.5; }
+.ingreso-pie a, .ingreso-aviso a { color: var(--acm-teal); }
+.ingreso-aviso { background: var(--acm-raised); border-radius: var(--r-md); padding: 14px 16px; font-size: 14px; line-height: 1.5; }
+.ingreso-aviso p { margin: 6px 0 0; color: var(--acm-muted); }
+.generado { margin-top: 24px; display: flex; flex-direction: column; gap: 8px; align-items: flex-start; font-size: 14px; }
+.generado p { margin: 0; line-height: 1.5; }
+.generado .lbl { font-weight: 600; margin-top: 10px; }
+.generado code { display: block; width: 100%; padding: 10px 12px; border-radius: var(--r-md); background: var(--acm-ink); border: 1px solid var(--acm-line); font-size: 12px; word-break: break-all; }
+.usuario-sesion { display: flex; align-items: center; gap: 10px; }

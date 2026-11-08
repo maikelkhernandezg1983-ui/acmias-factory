@@ -25,9 +25,13 @@ jobs:
       - name: Navegador para pruebas
         run: npx playwright install --with-deps chromium
       - name: Pruebas de punta a punta (390 y 1440 px)
+        env:
+          # Usuario solo de pruebas (vendedor / demo1234). Nunca usar estos valores en Vercel.
+          VENDEDORES: vendedor=pbkdf2$1000$cHJ1ZWJhLWUyZS1hY21pYXM$6PDGLoLQm3svv_sbNtdYY5uxlYhhsVCLu95taV4uulQ
+          SESION_SECRETO: solo-pruebas-e2e-no-usar-en-produccion-0123456789
         run: |
           PORT=3100 npm start &
-          npx wait-on http://localhost:3100
+          npx wait-on http://localhost:3100/ingresar
           LOGO_PRUEBA=tests/fixtures/logo-prueba.png npx playwright test
       - uses: actions/upload-artifact@v4
         if: always()

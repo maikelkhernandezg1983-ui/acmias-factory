@@ -2,8 +2,17 @@ import { test, expect, type Page } from '@playwright/test';
 
 const LOGO = process.env.LOGO_PRUEBA ?? '/tmp/logo-prueba.png';
 
-async function crearDemo(page: Page, nombre = 'Café La Esquina Azul') {
+async function ingresar(page: Page) {
   await page.goto('/');
+  if (!page.url().includes('/ingresar')) return;
+  await page.getByLabel('Usuario').fill('vendedor');
+  await page.getByLabel('Contraseña').fill('demo1234');
+  await page.getByRole('button', { name: 'Ingresar' }).click();
+  await page.waitForURL((u) => u.pathname === '/');
+}
+
+async function crearDemo(page: Page, nombre = 'Café La Esquina Azul') {
+  await ingresar(page);
   await page.getByLabel('Nombre del negocio').fill(nombre);
   await page.locator('#logo').setInputFiles(LOGO);
   await expect(page.getByText('tomados del logo')).toBeVisible();
@@ -127,7 +136,7 @@ test('mesa fuera de rango se ignora', async ({ page }) => {
 });
 
 test('el vendedor abre la demo de un cliente registrado con un toque', async ({ page }) => {
-  await page.goto('/');
+  await ingresar(page);
   await page.getByRole('button', { name: 'Ver demo de Trattoria Don Bruno' }).click();
   await expect(page.getByRole('heading', { level: 1, name: 'Trattoria Don Bruno' })).toBeVisible();
   await page.goto('/');
@@ -148,7 +157,7 @@ test('la landing registra un cliente y aparece en el panel', async ({ page, requ
   const ok = await request.post('/api/registros', { data: base, headers: { origin: 'https://acmias-landing-demo-bmhi.vercel.app' } });
   expect(ok.status()).toBe(201);
   expect(ok.headers()['access-control-allow-origin']).toBe('https://acmias-landing-demo-bmhi.vercel.app');
-  await page.goto('/');
+  await ingresar(page);
   await page.getByRole('button', { name: `Ver demo de ${nombre}` }).click();
   await expect(page.getByRole('heading', { level: 1, name: nombre })).toBeVisible();
 });
@@ -168,4 +177,27 @@ test('la mesa solo sale del QR: sin QR no se puede elegir una mesa a mano', asyn
   await page.getByRole('button', { name: /Ver pedido · 1/ }).click();
   await expect(page.getByText('Tomada del QR de tu mesa')).toBeVisible();
   await expect(page.getByRole('button', { name: /Enviar pedido por WhatsApp/ })).toBeEnabled();
+});
+
+test('el portal del vendedor pide usuario y contraseña', async ({ page, request }) => {
+  await page.goto('/');
+  await expect(page).toHaveURL(/\/ingresar$/);
+  await expect(page.getByRole('heading', { name: 'Portal del vendedor' })).toBeVisible();
+  await page.getByLabel('Usuario').fill('vendedor');
+  await page.getByLabel('Contraseña').fill('equivocada');
+  await page.getByRole('button', { name: 'Ingresar' }).click();
+  await expect(page.getByText('Usuario o contraseña incorrectos.')).toBeVisible();
+  expect((await request.get('/api/registros')).status()).toBe(401);
+  await ingresar(page);
+  await expect(page.getByText('Vendedor: vendedor')).toBeVisible();
+  await page.getByRole('button', { name: 'Salir' }).click();
+  await expect(page).toHaveURL(/\/ingresar$/);
+  await page.goto('/');
+  await expect(page).toHaveURL(/\/ingresar$/);
+});
+
+test('las demos siguen abiertas para el cliente sin ingresar', async ({ page }) => {
+  await page.goto('/d/cualquier-demo');
+  await expect(page).toHaveURL(/\/d\/cualquier-demo$/);
+  await expect(page.getByRole('heading', { name: 'Esta demo no está en este dispositivo' })).toBeVisible();
 });

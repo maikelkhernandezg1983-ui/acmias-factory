@@ -1,3 +1,4 @@
+import { vendedorActual } from '@/lib/sesion';
 import Anthropic from '@anthropic-ai/sdk';
 import { ESQUEMA_HERRAMIENTA, INSTRUCCIONES, normalizarMenu } from '@/lib/rubros/restaurante/menu-importado';
 
@@ -43,6 +44,7 @@ export async function POST(req: Request) {
   }
 
   if (!mismoOrigen(req)) return error('Origen no permitido.', 403);
+  if (!(await vendedorActual())) return error('Para importar el menú, el vendedor tiene que ingresar con su usuario en este dispositivo.', 401);
   const largo = Number(req.headers.get('content-length') ?? 0);
   if (largo > MAX_BYTES + 64 * 1024) return error('El archivo pesa más de 4 MB. Probá con una foto o un PDF más liviano.', 413);
   const ip = (req.headers.get('x-forwarded-for') ?? 'local').split(',')[0].trim();
