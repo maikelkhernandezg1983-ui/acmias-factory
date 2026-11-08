@@ -1,0 +1,37 @@
+name: Calidad
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  calidad:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - name: Lint
+        run: npm run lint
+      - name: Tipos
+        run: npx tsc --noEmit
+      - name: Build
+        run: npm run build
+      - name: Navegador para pruebas
+        run: npx playwright install --with-deps chromium
+      - name: Pruebas de punta a punta (390 y 1440 px)
+        run: |
+          PORT=3100 npm start &
+          npx wait-on http://localhost:3100
+          LOGO_PRUEBA=tests/fixtures/logo-prueba.png npx playwright test
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: capturas
+          path: test-results/
+          retention-days: 7
