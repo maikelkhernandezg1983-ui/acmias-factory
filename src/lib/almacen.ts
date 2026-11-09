@@ -9,8 +9,10 @@ import type { DemoConfig, DemoEstado } from './tipos';
 import { crearEstadoInicial } from './rubros/restaurante/datos-ejemplo';
 import { crearEstadoRepuestos } from './rubros/repuestos/datos-ejemplo';
 import { crearEstadoTienda } from './rubros/tienda/datos-ejemplo';
+import { crearEstadoBarberia } from './rubros/barberia/datos-ejemplo';
 
 function estadoInicial(config: DemoConfig): unknown {
+  if (config.rubro === 'barberia') return crearEstadoBarberia(config.moneda);
   if (config.rubro === 'tienda') return crearEstadoTienda(config.moneda, config.variante);
   return config.rubro === 'repuestos' ? crearEstadoRepuestos(config.moneda) : crearEstadoInicial(config.moneda);
 }

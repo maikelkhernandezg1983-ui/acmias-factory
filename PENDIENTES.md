@@ -14,13 +14,14 @@ Actualizado: 9 nov 2026. Marcá con [x] lo que se cierre.
 - [ ] QR de mesa con código único por mesa (hoy el número va en la dirección y se puede cambiar a mano).
 - [ ] Subdominio por demo (`{slug}.demo.acmias.com`) cuando esté el dominio.
 - [ ] Probar la importación con IA real (menú, planillas) con archivos de clientes reales.
+- [ ] Barbería: el enlace del turno (confirmar, cambiar, cancelar) y la lista de espera viven en el dispositivo de la demo; con la base de datos funcionan desde el celular del cliente. Envío automático de WhatsApp y cobro de señas: módulos próximamente.
 - [ ] Fotos: restaurante y tienda usan fotos libres de Unsplash; repuestos usa ilustraciones (las fotos libres mostraban marcas reales).
 
 ## Rubros
 - [x] Restaurante
 - [x] Repuestos
 - [x] Tienda con inventario (ropa y almacén)
-- [ ] Barbería / salón (en curso)
+- [x] Barbería / salón (reservas en 3 pasos, agenda por profesional, lista de espera, sellos, métricas)
 - [ ] Consultorio médico
 - [ ] Ferretería
 

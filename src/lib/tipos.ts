@@ -54,8 +54,8 @@ export interface Pedido {
   ejemplo?: boolean;
 }
 
-export type Rubro = 'restaurante' | 'repuestos' | 'tienda';
-export const RUBROS_LISTOS: Rubro[] = ['restaurante', 'repuestos', 'tienda'];
+export type Rubro = 'restaurante' | 'repuestos' | 'tienda' | 'barberia';
+export const RUBROS_LISTOS: Rubro[] = ['restaurante', 'repuestos', 'tienda', 'barberia'];
 
 export interface DemoConfig {
   slug: string;

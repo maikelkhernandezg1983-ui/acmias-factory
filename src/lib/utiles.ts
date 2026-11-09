@@ -85,7 +85,7 @@ const HORA = /^([01]\d|2[0-3]):[0-5]\d$/;
 const ConfigCompartida = z
   .object({
     slug: z.string().regex(/^[a-z0-9-]{1,48}$/),
-    rubro: z.enum(['restaurante', 'repuestos', 'tienda']).default('restaurante'),
+    rubro: z.enum(['restaurante', 'repuestos', 'tienda', 'barberia']).default('restaurante'),
     variante: z.enum(['moda', 'almacen']).optional(),
     negocio: z.string().trim().min(1).max(60),
     colorPrincipal: z.string().regex(/^#[0-9a-fA-F]{6}$/),

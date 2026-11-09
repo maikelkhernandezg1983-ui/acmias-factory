@@ -9,6 +9,9 @@ import { SitioRepuestos } from '@/components/repuestos/SitioRepuestos';
 import { Tienda } from '@/components/tienda/Tienda';
 import { PanelTienda } from '@/components/tienda/PanelTienda';
 import { SitioTienda } from '@/components/tienda/SitioTienda';
+import { Reserva } from '@/components/barberia/Reserva';
+import { PanelBarberia } from '@/components/barberia/PanelBarberia';
+import { SitioBarberia } from '@/components/barberia/SitioBarberia';
 import { DemoNoEncontrada, useConfigCargada } from './useDemoCargada';
 
 type Vista = 'cliente' | 'panel' | 'sitio';
@@ -17,6 +20,7 @@ const VISTAS = {
   restaurante: { cliente: Carta, panel: PanelDuenio, sitio: Sitio },
   repuestos: { cliente: Catalogo, panel: PanelRepuestos, sitio: SitioRepuestos },
   tienda: { cliente: Tienda, panel: PanelTienda, sitio: SitioTienda },
+  barberia: { cliente: Reserva, panel: PanelBarberia, sitio: SitioBarberia },
 } as const;
 
 /** Abre la pantalla que corresponde al rubro de la demo. */

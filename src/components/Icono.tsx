@@ -1,6 +1,6 @@
 type Nombre =
   | 'mas' | 'menos' | 'cerrar' | 'whatsapp' | 'carrito' | 'reloj' | 'subir' | 'qr' | 'imprimir'
-  | 'editar' | 'basura' | 'ojo' | 'chispa' | 'atras' | 'texto' | 'check' | 'deshacer' | 'enlace' | 'tienda' | 'grafico' | 'llave' | 'buscar' | 'lista' | 'info' | 'planilla';
+  | 'editar' | 'basura' | 'ojo' | 'chispa' | 'atras' | 'texto' | 'check' | 'deshacer' | 'enlace' | 'tienda' | 'grafico' | 'llave' | 'buscar' | 'lista' | 'info' | 'planilla' | 'calendario' | 'tijera' | 'usuario' | 'candado' | 'estrella';
 
 const P: Record<Nombre, React.ReactNode> = {
   mas: <path d="M12 5v14M5 12h14" />,
@@ -24,6 +24,32 @@ const P: Record<Nombre, React.ReactNode> = {
       <path d="M4 9h16M4 15h16M10 3v18" />
     </>
   ),
+  calendario: (
+    <>
+      <rect x="3.5" y="5" width="17" height="15.5" rx="2" />
+      <path d="M3.5 10h17M8 3v4M16 3v4" />
+    </>
+  ),
+  tijera: (
+    <>
+      <circle cx="6" cy="6" r="3" />
+      <circle cx="6" cy="18" r="3" />
+      <path d="M20 4 8.1 15.9M14.5 14.5 20 20M8.1 8.1 12 12" />
+    </>
+  ),
+  usuario: (
+    <>
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 21a8 8 0 0 1 16 0" />
+    </>
+  ),
+  candado: (
+    <>
+      <rect x="4.5" y="11" width="15" height="10" rx="2" />
+      <path d="M8 11V7a4 4 0 0 1 8 0v4" />
+    </>
+  ),
+  estrella: <path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1 6.2L12 17.3 6.5 20.2l1-6.2L3 9.6l6.2-.9z" />,
   menos: <path d="M5 12h14" />,
   cerrar: <path d="M18 6 6 18M6 6l12 12" />,
   whatsapp: <path d="M21 12a9 9 0 0 1-13.5 7.8L3 21l1.2-4.5A9 9 0 1 1 21 12z" />,
