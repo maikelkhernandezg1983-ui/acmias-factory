@@ -19,9 +19,8 @@ function vendedores(): Map<string, string> {
   const crudo = process.env.VENDEDORES ?? (produccion ? '' : DEV_VENDEDORES);
   const m = new Map<string, string>();
   // Tolera errores comunes al pegar en Vercel: comillas, espacios, saltos de línea o el nombre "VENDEDORES=" incluido.
-  const limpio = crudo.trim().replace(/^VENDEDORES\s*=\s*/i, '');
-  for (const entrada of limpio.split(/[;\n,]+/)) {
-    const par = entrada.trim().replace(/^["'`]+|["'`]+$/g, '');
+  for (const entrada of crudo.split(/[;\n,]+/)) {
+    const par = entrada.trim().replace(/^["'`\s]+|["'`\s]+$/g, '').replace(/^VENDEDORES\s*=\s*/i, '');
     const i = par.indexOf('=');
     if (i > 0) m.set(par.slice(0, i).trim().toLowerCase(), par.slice(i + 1).trim().replace(/\s+/g, ''));
   }
@@ -29,7 +28,7 @@ function vendedores(): Map<string, string> {
 }
 
 function secreto() {
-  const v = process.env.SESION_SECRETO?.trim().replace(/^SESION_SECRETO\s*=\s*/i, '').replace(/^["'`]+|["'`]+$/g, '');
+  const v = process.env.SESION_SECRETO?.replace(/^["'`\s]+|["'`\s]+$/g, '').replace(/^SESION_SECRETO\s*=\s*/i, '');
   return v || (produccion ? '' : 'secreto-solo-para-desarrollo');
 }
 
