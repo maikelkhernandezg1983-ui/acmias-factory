@@ -54,9 +54,12 @@ export interface Pedido {
   ejemplo?: boolean;
 }
 
+export type Rubro = 'restaurante' | 'repuestos';
+export const RUBROS_LISTOS: Rubro[] = ['restaurante', 'repuestos'];
+
 export interface DemoConfig {
   slug: string;
-  rubro: 'restaurante';
+  rubro: Rubro;
   /** Registro del cliente (formulario de la web) del que salió la demo. */
   registroId?: string;
   negocio: string;

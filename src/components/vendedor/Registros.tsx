@@ -4,7 +4,7 @@ import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { crearSlug, guardarDemo, useDemos } from '@/lib/almacen';
 import { crearTema } from '@/lib/marca';
-import type { DemoConfig } from '@/lib/tipos';
+import type { DemoConfig, Rubro } from '@/lib/tipos';
 import type { Registro } from '@/lib/registros';
 
 const NOMBRE_RUBRO: Record<Registro['rubro'], string> = {
@@ -15,7 +15,7 @@ const NOMBRE_RUBRO: Record<Registro['rubro'], string> = {
   consultorio: 'Consultorio',
   ferreteria: 'Ferretería',
 };
-const RUBROS_LISTOS: Registro['rubro'][] = ['restaurante'];
+const RUBROS_LISTOS: Registro['rubro'][] = ['restaurante', 'repuestos'];
 
 type Vista = { tipo: 'cargando' } | { tipo: 'clave' } | { tipo: 'error'; texto: string } | { tipo: 'lista'; registros: Registro[] };
 
@@ -49,7 +49,7 @@ export function Registros() {
     if (existente) return router.push(`/d/${existente.slug}`);
     const config: DemoConfig = {
       slug: `${crearSlug(r.negocio)}-${r.id.slice(-5)}`,
-      rubro: 'restaurante',
+      rubro: r.rubro as Rubro,
       registroId: r.id,
       negocio: r.negocio,
       logo: r.logo,

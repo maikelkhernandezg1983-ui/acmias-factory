@@ -1,6 +1,6 @@
-import { Carta } from '@/components/demo/Carta';
+import { PorRubro } from '@/components/demo/PorRubro';
 
-export default async function PaginaCarta({ params }: { params: Promise<{ slug: string }> }) {
+export default async function Pagina({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  return <Carta slug={slug} />;
+  return <PorRubro slug={slug} vista="cliente" />;
 }

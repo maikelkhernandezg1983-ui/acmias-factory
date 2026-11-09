@@ -9,7 +9,7 @@ import { coloresDeImagen, reducirImagen, validarImagen } from '@/lib/imagen';
 import { MONEDAS } from '@/lib/rubros/restaurante/datos-ejemplo';
 import { codificarConfig, soloDigitos } from '@/lib/utiles';
 import { crearTema } from '@/lib/marca';
-import type { DemoConfig } from '@/lib/tipos';
+import type { DemoConfig, Rubro } from '@/lib/tipos';
 import { Icono } from '@/components/Icono';
 import { useDialogo } from '@/components/useDialogo';
 import { Registros } from './Registros';
@@ -17,7 +17,7 @@ import { Registros } from './Registros';
 const RUBROS = [
   { id: 'restaurante', nombre: 'Restaurante', listo: true },
   { id: 'tienda', nombre: 'Tienda', listo: false },
-  { id: 'repuestos', nombre: 'Repuestos', listo: false },
+  { id: 'repuestos', nombre: 'Repuestos', listo: true },
   { id: 'barberia', nombre: 'Barbería', listo: false },
   { id: 'consultorio', nombre: 'Consultorio', listo: false },
   { id: 'ferreteria', nombre: 'Ferretería', listo: false },
@@ -26,6 +26,7 @@ const RUBROS = [
 export function PanelVendedor({ usuario }: { usuario: string }) {
   const demos = useDemos();
   const router = useRouter();
+  const [rubro, setRubro] = useState<Rubro>('restaurante');
   const [negocio, setNegocio] = useState('');
   const [logo, setLogo] = useState<string | undefined>();
   const [c1, setC1] = useState('#B3261E');
@@ -76,7 +77,7 @@ export function PanelVendedor({ usuario }: { usuario: string }) {
     if (Object.keys(e).length) return;
     const config: DemoConfig = {
       slug: crearSlug(negocio),
-      rubro: 'restaurante',
+      rubro,
       negocio: negocio.trim(),
       logo,
       colorPrincipal: c1.toUpperCase(),
@@ -140,7 +141,7 @@ export function PanelVendedor({ usuario }: { usuario: string }) {
               <span className="lbl" id="lbl-rubro">Rubro</span>
               <div className="rubros" role="group" aria-labelledby="lbl-rubro">
                 {RUBROS.map((r) => (
-                  <button key={r.id} type="button" className="rubro" aria-pressed={r.id === 'restaurante'} disabled={!r.listo} title={r.listo ? undefined : 'Próximamente'}>
+                  <button key={r.id} type="button" className="rubro" aria-pressed={r.id === rubro} disabled={!r.listo} title={r.listo ? undefined : 'Próximamente'} onClick={() => setRubro(r.id as Rubro)}>
                     {r.nombre}{!r.listo && ' · próximamente'}
                   </button>
                 ))}
@@ -196,16 +197,18 @@ export function PanelVendedor({ usuario }: { usuario: string }) {
             <div className="campo">
               <label htmlFor="wa">WhatsApp del negocio</label>
               <input id="wa" className="inp" inputMode="tel" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="54 9 11 5555 1234" autoComplete="tel" />
-              <span className="ayuda">Con código de país. Acá llegan los pedidos de la demo.</span>
+              <span className="ayuda">Con código de país. Acá llegan los {rubro === 'repuestos' ? 'pedidos de cotización' : 'pedidos'} de la demo.</span>
               {errores.whatsapp && <p className="err" role="alert">{errores.whatsapp}</p>}
             </div>
 
             <div className="fila">
-              <div className="campo">
-                <label htmlFor="mesas">Mesas</label>
-                <input id="mesas" type="number" min={1} max={60} className="inp" value={mesas} onChange={(e) => setMesas(Number(e.target.value))} />
-                {errores.mesas && <p className="err" role="alert">{errores.mesas}</p>}
-              </div>
+              {rubro === 'restaurante' && (
+                <div className="campo">
+                  <label htmlFor="mesas">Mesas</label>
+                  <input id="mesas" type="number" min={1} max={60} className="inp" value={mesas} onChange={(e) => setMesas(Number(e.target.value))} />
+                  {errores.mesas && <p className="err" role="alert">{errores.mesas}</p>}
+                </div>
+              )}
               <div className="campo">
                 <label htmlFor="moneda">Moneda</label>
                 <select id="moneda" className="inp" value={moneda} onChange={(e) => setMoneda(e.target.value)}>
@@ -214,6 +217,8 @@ export function PanelVendedor({ usuario }: { usuario: string }) {
               </div>
             </div>
 
+            {rubro === 'restaurante' && (
+              <>
             <div className="fila">
               <div className="campo">
                 <label htmlFor="ap">Abre</label>
@@ -243,10 +248,12 @@ export function PanelVendedor({ usuario }: { usuario: string }) {
                 </div>
               )}
             </div>
+              </>
+            )}
 
             {errores.general && <p className="err" role="alert">{errores.general}</p>}
             <button type="submit" className="btn btn-teal" style={{ width: '100%', marginTop: 8 }}>Abrir demo</button>
-            <p className="ayuda" style={{ fontSize: 13, color: 'var(--acm-muted)', marginTop: 10 }}>La carta trae platos de ejemplo. En la visita podés cargar el menú real desde una foto.</p>
+            <p className="ayuda" style={{ fontSize: 13, color: 'var(--acm-muted)', marginTop: 10 }}>{rubro === 'repuestos' ? 'El catálogo trae piezas y vehículos de ejemplo. En la visita podés cargar la planilla del local.' : 'La carta trae platos de ejemplo. En la visita podés cargar el menú real desde una foto.'}</p>
           </form>
 
           <section className="acm-card" aria-labelledby="tus-demos">
@@ -263,7 +270,7 @@ export function PanelVendedor({ usuario }: { usuario: string }) {
                 <div style={{ minWidth: 0 }}>
                   <strong style={{ fontSize: 17, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.negocio}</strong>
                   <span style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
-                    <span className="chip">Restaurante</span>
+                    <span className="chip">{d.rubro === 'repuestos' ? 'Repuestos' : 'Restaurante'}</span>
                     <span className="chip"><span style={{ width: 10, height: 10, borderRadius: 3, background: d.colorPrincipal, display: 'inline-block' }} /><span style={{ width: 10, height: 10, borderRadius: 3, background: d.colorSecundario, display: 'inline-block' }} /> {d.moneda}</span>
                     <span className="chip">{new Date(d.creada).toLocaleDateString('es')}</span>
                   </span>

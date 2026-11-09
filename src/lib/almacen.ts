@@ -7,6 +7,11 @@
 import { useCallback, useSyncExternalStore } from 'react';
 import type { DemoConfig, DemoEstado } from './tipos';
 import { crearEstadoInicial } from './rubros/restaurante/datos-ejemplo';
+import { crearEstadoRepuestos } from './rubros/repuestos/datos-ejemplo';
+
+function estadoInicial(config: DemoConfig): unknown {
+  return config.rubro === 'repuestos' ? crearEstadoRepuestos(config.moneda) : crearEstadoInicial(config.moneda);
+}
 
 const CLAVE_DEMOS = 'acmias:demos';
 const claveEstado = (slug: string) => `acmias:demo:${slug}`;
@@ -76,15 +81,16 @@ export function useDemo(slug: string) {
   return demos.find((d) => d.slug === slug);
 }
 
-export function useEstado(slug: string) {
+/** Estado de una demo de cualquier rubro (cada rubro define su forma). */
+export function useEstadoDe<T>(slug: string) {
   const estado = useSyncExternalStore(
     suscribir,
-    () => leerCacheado<DemoEstado | null>(claveEstado(slug), null),
+    () => leerCacheado<T | null>(claveEstado(slug), null),
     () => null,
   );
   const actualizar = useCallback(
-    (fn: (e: DemoEstado) => DemoEstado): string | null => {
-      const actual = leer<DemoEstado | null>(claveEstado(slug), null);
+    (fn: (e: T) => T): string | null => {
+      const actual = leer<T | null>(claveEstado(slug), null);
       if (!actual) return 'No encontramos los datos de esta demo en el dispositivo.';
       try {
         escribir(claveEstado(slug), fn(actual));
@@ -98,10 +104,15 @@ export function useEstado(slug: string) {
   return [estado, actualizar] as const;
 }
 
+
+export function useEstado(slug: string) {
+  return useEstadoDe<DemoEstado>(slug);
+}
+
 export function guardarDemo(config: DemoConfig) {
   // Primero el estado: si falta espacio, no queda una demo sin datos.
   if (!leer(claveEstado(config.slug), null)) {
-    escribir(claveEstado(config.slug), crearEstadoInicial(config.moneda));
+    escribir(claveEstado(config.slug), estadoInicial(config));
   }
   const demos = leer<DemoConfig[]>(CLAVE_DEMOS, []);
   const otras = demos.filter((d) => d.slug !== config.slug);
@@ -127,8 +138,8 @@ export function borrarDemo(slug: string) {
   window.dispatchEvent(new CustomEvent(EVENTO));
 }
 
-export function reiniciarDatos(slug: string, moneda: string) {
-  escribir(claveEstado(slug), crearEstadoInicial(moneda));
+export function reiniciarDatos(slug: string, moneda: string, rubro: DemoConfig['rubro'] = 'restaurante') {
+  escribir(claveEstado(slug), rubro === 'repuestos' ? crearEstadoRepuestos(moneda) : crearEstadoInicial(moneda));
 }
 
 export function existeSlug(slug: string) {

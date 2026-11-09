@@ -9,10 +9,9 @@ import { VERSION_DATOS, fotoEjemplo } from '@/lib/rubros/restaurante/datos-ejemp
 
 const sinSuscripcion = () => () => {};
 
-/** Carga la demo del dispositivo o, si llegó por enlace compartido, la importa desde el enlace. */
-export function useDemoCargada(slug: string) {
+/** Configuración de la demo (cualquier rubro): la toma del dispositivo o la importa del enlace compartido. */
+export function useConfigCargada(slug: string) {
   const config = useDemo(slug);
-  const [estado, actualizar] = useEstado(slug);
   const listo = useSyncExternalStore(sinSuscripcion, () => true, () => false);
 
   useEffect(() => {
@@ -29,20 +28,28 @@ export function useDemoCargada(slug: string) {
     }
   }, [config, slug]);
 
+  const tema = useMemo(() => (config ? crearTema(config.colorPrincipal, config.colorSecundario) : null), [config]);
+  const estilo = useMemo(() => (tema ? (temaComoEstilo(tema) as React.CSSProperties) : undefined), [tema]);
+  return { config, tema, estilo, listo };
+}
+
+/** Demo de restaurante: configuración + carta guardada en el dispositivo. */
+export function useDemoCargada(slug: string) {
+  const { config: c, tema, estilo, listo } = useConfigCargada(slug);
+  const config = c?.rubro === 'restaurante' ? c : undefined;
+  const [estado, actualizar] = useEstado(slug);
+
   // Demos creadas con datos de ejemplo viejos: suman las fotos sin tocar lo que cargó el dueño.
   useEffect(() => {
-    if (!estado || (estado.version ?? 1) >= VERSION_DATOS) return;
+    if (!config || !estado?.platos || (estado.version ?? 1) >= VERSION_DATOS) return;
     actualizar((e) => ({
       ...e,
       version: VERSION_DATOS,
       platos: e.platos.map((p) => (p.foto || p.importado ? p : { ...p, foto: fotoEjemplo(p.id) })),
     }));
-  }, [estado, actualizar]);
+  }, [config, estado, actualizar]);
 
-  const tema = useMemo(() => (config ? crearTema(config.colorPrincipal, config.colorSecundario) : null), [config]);
-  const estilo = useMemo(() => (tema ? (temaComoEstilo(tema) as React.CSSProperties) : undefined), [tema]);
-
-  return { config, estado, actualizar, tema, estilo, listo };
+  return { config, estado: config ? estado : null, actualizar, tema, estilo, listo };
 }
 
 export function DemoNoEncontrada({ listo }: { listo: boolean }) {
@@ -58,6 +65,6 @@ export function DemoNoEncontrada({ listo }: { listo: boolean }) {
   );
 }
 
-export function AvisoDemo() {
-  return <div className="aviso-demo">Demo ilustrativa de ACMIAS · Platos y precios de ejemplo</div>;
+export function AvisoDemo({ texto = 'Platos y precios de ejemplo' }: { texto?: string }) {
+  return <div className="aviso-demo">Demo ilustrativa de ACMIAS · {texto}</div>;
 }

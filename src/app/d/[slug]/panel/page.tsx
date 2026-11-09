@@ -1,6 +1,6 @@
-import { PanelDuenio } from '@/components/demo/PanelDuenio';
+import { PorRubro } from '@/components/demo/PorRubro';
 
 export default async function Pagina({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params;
-  return <PanelDuenio slug={slug} />;
+  return <PorRubro slug={slug} vista="panel" />;
 }

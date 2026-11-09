@@ -1,5 +1,10 @@
 import { test, expect, type Page } from '@playwright/test';
 
+// El local de ejemplo abre de 08:00 a 23:00: las pruebas corren siempre a las 13:00 para no depender del reloj.
+test.beforeEach(async ({ page }) => {
+  await page.clock.setFixedTime(new Date(2026, 10, 9, 13, 0));
+});
+
 const LOGO = process.env.LOGO_PRUEBA ?? '/tmp/logo-prueba.png';
 
 async function ingresar(page: Page) {
@@ -144,7 +149,9 @@ test('el vendedor abre la demo de un cliente registrado con un toque', async ({ 
   await page.getByRole('button', { name: 'Ver demo de Trattoria Don Bruno' }).click();
   await expect(page).toHaveURL(/trattoria-don-bruno-[a-z0-9-]+$/);
   await page.goto('/');
-  await expect(page.getByRole('button', { name: 'Ver demo de Repuestos Ruta 9' })).toBeDisabled();
+  await page.getByRole('button', { name: 'Ver demo de Repuestos Ruta 9' }).click();
+  await expect(page.getByRole('heading', { name: '¿Para qué auto buscás?' })).toBeVisible();
+  await expect(page.getByRole('heading', { level: 1, name: 'Repuestos Ruta 9' })).toBeVisible();
 });
 
 test('la landing registra un cliente y aparece en el panel', async ({ page, request }) => {

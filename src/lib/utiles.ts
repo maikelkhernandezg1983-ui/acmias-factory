@@ -85,7 +85,7 @@ const HORA = /^([01]\d|2[0-3]):[0-5]\d$/;
 const ConfigCompartida = z
   .object({
     slug: z.string().regex(/^[a-z0-9-]{1,48}$/),
-    rubro: z.literal('restaurante'),
+    rubro: z.enum(['restaurante', 'repuestos']).default('restaurante'),
     negocio: z.string().trim().min(1).max(60),
     colorPrincipal: z.string().regex(/^#[0-9a-fA-F]{6}$/),
     colorSecundario: z.string().regex(/^#[0-9a-fA-F]{6}$/),
@@ -110,7 +110,7 @@ export function decodificarConfig(texto: string): DemoConfig | null {
     const c = r.data;
     return {
       slug: c.slug,
-      rubro: 'restaurante',
+      rubro: c.rubro,
       negocio: c.negocio,
       colorPrincipal: c.colorPrincipal.toUpperCase(),
       colorSecundario: c.colorSecundario.toUpperCase(),
