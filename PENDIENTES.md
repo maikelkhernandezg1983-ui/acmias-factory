@@ -15,6 +15,7 @@ Actualizado: 9 nov 2026. Marcá con [x] lo que se cierre.
 - [ ] Subdominio por demo (`{slug}.demo.acmias.com`) cuando esté el dominio.
 - [ ] Probar la importación con IA real (menú, planillas) con archivos de clientes reales.
 - [ ] Barbería: el enlace del turno (confirmar, cambiar, cancelar) y la lista de espera viven en el dispositivo de la demo; con la base de datos funcionan desde el celular del cliente. Envío automático de WhatsApp y cobro de señas: módulos próximamente.
+- [ ] Ferretería: con la clave de IA, probar la lectura de fotos con 20 listas reales del primer cliente antes de activarla (puerta del rubro).
 - [ ] Fotos: restaurante y tienda usan fotos libres de Unsplash; repuestos usa ilustraciones (las fotos libres mostraban marcas reales).
 
 ## Rubros
