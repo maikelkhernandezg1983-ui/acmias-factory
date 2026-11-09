@@ -92,7 +92,7 @@ export function crearEstadoConsultorio(moneda: string, ahora = Date.now()): Esta
   const viernes = sumarDias(lunes, 11);
   estado.bloqueos.push({ id: 'b1', profId: 'm-castillo', desde: conMinutos(viernes, 0).toISOString(), hasta: conMinutos(viernes, 1440).toISOString(), motivo: 'Congreso' });
 
-  const elegir = () => clientes[Math.floor(r() ** 1.4 * clientes.length)];
+  const elegir = () => clientes[1 + Math.floor(r() ** 1.4 * (clientes.length - 1))];
   for (let d = -28; d < 14; d++) {
     const dia = sumarDias(lunes, d);
     const h = HORARIO_CONS[dia.getDay()];
@@ -155,6 +155,16 @@ export function crearEstadoConsultorio(moneda: string, ahora = Date.now()): Esta
       ejemplo: true,
     });
   }
+  // Ana es paciente habitual: una consulta cada una o dos semanas, más un turno próximo.
+  const pasados = estado.turnos.filter((t) => +new Date(t.fin) <= ahora && t.estado === 'atendido' && !t.sobreturno);
+  const porDia = new Map<string, Turno>();
+  for (const t of pasados) porDia.set(claveDia(t.inicio), t);
+  [...porDia.values()].filter((_, i, a) => (a.length - 1 - i) % 6 === 0).slice(-5).forEach((t) => {
+    t.clienteId = clientes[0].id;
+    t.cobertura = PROFESIONALES_CONS.find((p) => p.id === t.profId)!.coberturas!.includes('Salud Plus') ? 'Salud Plus' : PARTICULAR;
+  });
+  const prox = estado.turnos.find((t) => +new Date(t.inicio) > ahora + 2 * DIA_MS && t.profId === 'm-mendez' && !t.sobreturno);
+  if (prox) Object.assign(prox, { clienteId: clientes[0].id, cobertura: 'Salud Plus', estado: 'confirmado' });
   for (const c of clientes) c.ausencias = estado.turnos.filter((t) => t.clienteId === c.id && t.estado === 'ausente').length;
   // Paciente con historial limpio (sin ausencias) para mostrar.
   estado.turnos.filter((t) => t.clienteId === clientes[0].id && t.estado === 'ausente').forEach((t) => (t.estado = 'atendido'));
