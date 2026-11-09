@@ -16,6 +16,11 @@ export interface NuevaReserva {
   nombre: string;
   whatsapp: string;
   origen: Turno['origen'];
+  /** Consultorio. */
+  cobertura?: string;
+  afiliado?: string;
+  modalidad?: Turno['modalidad'];
+  sobreturno?: boolean;
 }
 
 /** Crea el turno (y el cliente si es nuevo). Devuelve error en texto o el estado nuevo y el turno. */
@@ -23,13 +28,17 @@ export function reservar(e: EstadoAgenda, r: NuevaReserva): { error: string } | 
   const s = e.servicios.find((x) => x.id === r.servicioId);
   if (!s) return { error: 'Ese servicio ya no está disponible.' };
   const fin = r.inicio + s.duracion * 60_000;
-  if (!libre(e, r.profId, r.inicio, fin)) return { error: 'Ese horario se acaba de ocupar. Elegí otro.' };
+  if (!r.sobreturno && !libre(e, r.profId, r.inicio, fin)) return { error: 'Ese horario se acaba de ocupar. Elegí otro.' };
   const wa = soloDigitos(r.whatsapp);
   let clientes = e.clientes;
-  let cliente = wa ? clientes.find((c) => c.whatsapp === wa) : undefined;
+  let cliente = wa ? clientes.find((c) => c.whatsapp === wa) : r.origen === 'manual' ? clientes.find((c) => c.nombre === r.nombre.trim()) : undefined;
   if (!cliente) {
     cliente = { id: `c-${id()}`, nombre: r.nombre.trim(), whatsapp: wa, notas: '', sellos: 0, ausencias: 0, creado: new Date().toISOString() };
+    if (r.cobertura) Object.assign(cliente, { cobertura: r.cobertura, afiliado: r.afiliado?.trim() || undefined });
     clientes = [...clientes, cliente];
+  } else if (r.cobertura) {
+    const id_ = cliente.id;
+    clientes = clientes.map((c) => (c.id === id_ ? { ...c, cobertura: r.cobertura, afiliado: r.afiliado?.trim() || c.afiliado } : c));
   }
   const turno: Turno = {
     id: `t-${id()}`,
@@ -42,6 +51,9 @@ export function reservar(e: EstadoAgenda, r: NuevaReserva): { error: string } | 
     estado: 'reservado',
     origen: r.origen,
     creado: new Date().toISOString(),
+    ...(r.cobertura ? { cobertura: r.cobertura } : {}),
+    ...(r.modalidad ? { modalidad: r.modalidad } : {}),
+    ...(r.sobreturno ? { sobreturno: true } : {}),
   };
   return { estado: { ...e, clientes, turnos: [...e.turnos, turno] }, turno };
 }
@@ -112,8 +124,24 @@ function lineaTurno(e: EstadoAgenda, t: Turno) {
   return `${s?.nombre ?? 'Turno'} con ${p?.nombre.split(' ')[0] ?? ''}, ${nombreDia(t.inicio)} a las ${hora(t.inicio)} h`;
 }
 
+/**
+ * Consultorio (CON-04): plantillas neutras. Nunca nombran al profesional, la especialidad,
+ * el tipo de consulta ni el motivo: solo día, hora y lugar.
+ */
+function cuandoNeutro(t: Pick<Turno, 'inicio'>) {
+  const d = nombreDia(t.inicio);
+  return `${d === 'hoy' || d === 'mañana' ? d : `el ${d}`} a las ${hora(t.inicio)} h`;
+}
+
 /** Lo que recibe el cliente al reservar. */
 export function mensajeConfirmacion(e: EstadoAgenda, t: Turno, c: Cliente, ctx: Ctx) {
+  if (e.rubro === 'consultorio') {
+    return [
+      `Hola ${c.nombre.split(' ')[0]}, tu turno en ${ctx.negocio} quedó reservado para ${cuandoNeutro(t)}.`,
+      t.modalidad === 'video' ? 'Es por videollamada: el enlace te llega antes del horario.' : ctx.direccion ? `Dirección: ${ctx.direccion}` : '',
+      ctx.enlaceTurno ? `\nConfirmá, cambiá o cancelá acá: ${ctx.enlaceTurno}` : '',
+    ].filter(Boolean).join('\n');
+  }
   const s = e.servicios.find((x) => x.id === t.servicioId);
   const lineas = [
     `Hola ${c.nombre.split(' ')[0]}, te esperamos en ${ctx.negocio}.`,
@@ -127,6 +155,12 @@ export function mensajeConfirmacion(e: EstadoAgenda, t: Turno, c: Cliente, ctx: 
 
 /** Recordatorio del día anterior. */
 export function mensajeRecordatorio(e: EstadoAgenda, t: Turno, c: Cliente, ctx: Ctx) {
+  if (e.rubro === 'consultorio') {
+    return [
+      `Hola ${c.nombre.split(' ')[0]}, te recordamos tu turno en ${ctx.negocio}, ${cuandoNeutro(t)}.`,
+      ctx.enlaceTurno ? `\nConfirmá o reprogramalo acá: ${ctx.enlaceTurno}` : '',
+    ].join('\n');
+  }
   return [
     `Hola ${c.nombre.split(' ')[0]}, te recordamos tu turno en ${ctx.negocio}:`,
     `${lineaTurno(e, t)}.`,
@@ -136,6 +170,7 @@ export function mensajeRecordatorio(e: EstadoAgenda, t: Turno, c: Cliente, ctx: 
 
 /** Lo que el cliente le manda al local al terminar la reserva. */
 export function mensajeAlLocal(e: EstadoAgenda, t: Turno, c: Cliente, ctx: Ctx) {
+  if (e.rubro === 'consultorio') return `Hola ${ctx.negocio}, soy ${c.nombre}. Reservé un turno para ${cuandoNeutro(t)}.`;
   return `Hola ${ctx.negocio}, soy ${c.nombre}. Reservé ${lineaTurno(e, t)}.`;
 }
 
@@ -143,6 +178,7 @@ export function mensajeEspera(e: EstadoAgenda, x: EnEspera, ctx: Ctx & { enlaceR
   const s = e.servicios.find((y) => y.id === x.servicioId);
   const t = x.turnoLiberado ? e.turnos.find((y) => y.id === x.turnoLiberado) : undefined;
   const cuando = t ? `${nombreDia(t.inicio)} a las ${hora(t.inicio)} h` : nombreDia(x.dia + 'T12:00:00');
+  if (e.rubro === 'consultorio') return `Hola ${x.nombre.split(' ')[0]}, se liberó un turno en ${ctx.negocio} para ${t ? cuandoNeutro(t) : nombreDia(x.dia + 'T12:00:00')}. Si lo querés, reservalo acá: ${ctx.enlaceReserva}`;
   return `Hola ${x.nombre.split(' ')[0]}, se liberó un turno en ${ctx.negocio} para ${s?.nombre ?? 'tu servicio'}: ${cuando}. Si lo querés, reservalo acá antes que otro: ${ctx.enlaceReserva}`;
 }
 

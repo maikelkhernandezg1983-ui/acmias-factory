@@ -82,7 +82,14 @@ export function abierto(horario: Horario, dia: Date) {
 }
 
 /** ¿Está libre el profesional en [desde, hasta)? Respeta turnos activos y bloqueos. */
-export function libre(e: Pick<EstadoAgenda, 'turnos' | 'bloqueos'>, profId: string, desde: number, hasta: number, ignorar?: string) {
+export function enPausa(e: Pick<EstadoAgenda, 'pausa'>, desde: number, hasta: number) {
+  if (!e.pausa) return false;
+  const d = new Date(desde);
+  return seSolapan(desde, hasta, +conMinutos(d, e.pausa[0]), +conMinutos(d, e.pausa[1]));
+}
+
+export function libre(e: Pick<EstadoAgenda, 'turnos' | 'bloqueos' | 'pausa'>, profId: string, desde: number, hasta: number, ignorar?: string) {
+  if (enPausa(e, desde, hasta)) return false;
   const choca = e.turnos.some(
     (t) => t.profId === profId && t.id !== ignorar && esActivo(t) && seSolapan(desde, hasta, +new Date(t.inicio), +new Date(t.fin)),
   );
@@ -151,7 +158,8 @@ export function minutosDisponibles(e: EstadoAgenda, prof: Profesional, dia: Date
   const bloqueado = e.bloqueos
     .filter((b) => b.profId === null || b.profId === prof.id)
     .reduce((s, b) => s + Math.max(0, Math.min(z, +new Date(b.hasta)) - Math.max(a, +new Date(b.desde))), 0);
-  return Math.max(0, (z - a - bloqueado) / 60_000);
+  const pausa = e.pausa ? Math.max(0, Math.min(z, +conMinutos(dia, e.pausa[1])) - Math.max(a, +conMinutos(dia, e.pausa[0]))) : 0;
+  return Math.max(0, (z - a - bloqueado - pausa) / 60_000);
 }
 
 export function minutosOcupados(turnos: Turno[], profId: string, dia: Date) {

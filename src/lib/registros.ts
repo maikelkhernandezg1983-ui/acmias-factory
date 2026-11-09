@@ -70,6 +70,7 @@ function asegurarTabla() {
 const memoria: Registro[] = [
   { id: 'r-ejemplo-1', negocio: 'Trattoria Don Bruno', rubro: 'restaurante', colorPrincipal: '#1F5135', colorSecundario: '#E9B44C', whatsapp: '5491155550001', email: 'demo@ejemplo.com', caso: 'Quieren la carta con QR por mesa y pedidos por WhatsApp.', creado: '2026-11-06T14:10:00.000Z', ejemplo: true },
   { id: 'r-ejemplo-2', negocio: 'La Parrilla del Puerto', rubro: 'restaurante', colorPrincipal: '#7A1F1F', colorSecundario: '#F2C14E', whatsapp: '5491155550002', email: 'demo@ejemplo.com', caso: 'Delivery propio y subir precios rápido.', creado: '2026-11-07T19:25:00.000Z', ejemplo: true },
+  { id: 'r-ejemplo-5', negocio: 'Consultorio Integral Sur', rubro: 'consultorio', colorPrincipal: '#0F5F73', colorSecundario: '#9ED8C9', whatsapp: '5491155550005', email: 'demo@ejemplo.com', caso: 'Menos ausencias y que la secretaria no confirme a mano.', creado: '2026-11-09T11:30:00.000Z', ejemplo: true },
   { id: 'r-ejemplo-4', negocio: 'Barbería El Faro', rubro: 'barberia', colorPrincipal: '#1D2B3A', colorSecundario: '#C8963E', whatsapp: '5491155550004', email: 'demo@ejemplo.com', caso: 'Turnos online sin llamadas y menos ausencias.', creado: '2026-11-09T09:40:00.000Z', ejemplo: true },
   { id: 'r-ejemplo-3', negocio: 'Repuestos Ruta 9', rubro: 'repuestos', colorPrincipal: '#0E3B66', colorSecundario: '#F28C28', whatsapp: '5491155550003', email: 'demo@ejemplo.com', caso: 'Catálogo por modelo de auto.', creado: '2026-11-08T10:05:00.000Z', ejemplo: true },
 ];

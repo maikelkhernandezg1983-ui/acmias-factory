@@ -219,7 +219,7 @@ export function Reserva({ slug }: { slug: string }) {
   );
 }
 
-function Horarios({ estado }: { estado: EstadoAgenda }) {
+export function Horarios({ estado }: { estado: EstadoAgenda }) {
   const dias = [1, 2, 3, 4, 5, 6, 0].filter((d) => estado.horario[d]);
   if (!dias.length) return null;
   const h = estado.horario[dias[0]]!;
@@ -227,7 +227,7 @@ function Horarios({ estado }: { estado: EstadoAgenda }) {
   const fmt = (m: number) => `${Math.floor(m / 60)}${m % 60 ? `:${String(m % 60).padStart(2, '0')}` : ''}`;
   return (
     <p className="bar-horario">
-      <Icono nombre="reloj" size={16} /> {DIAS[dias[0]]} a {DIAS[dias[dias.length - 1]]} · {fmt(h[0])} a {fmt(h[1])} h
+      <Icono nombre="reloj" size={16} /> {DIAS[dias[0]]} a {DIAS[dias[dias.length - 1]]} · {fmt(h[0])} a {fmt(h[1])} h{estado.pausa ? ` (cerrado de ${fmt(estado.pausa[0])} a ${fmt(estado.pausa[1])})` : ''}
     </p>
   );
 }
@@ -306,7 +306,7 @@ function Datos({ config, estado, servicio, hueco, actualizar, onListo, onOcupado
   );
 }
 
-function Listo({ config, estado, turno, slug, estilo, otra }: { config: DemoConfig; estado: EstadoAgenda; turno: Turno; slug: string; estilo?: React.CSSProperties; otra: () => void }) {
+export function Listo({ config, estado, turno, slug, estilo, otra }: { config: DemoConfig; estado: EstadoAgenda; turno: Turno; slug: string; estilo?: React.CSSProperties; otra: () => void }) {
   const c = estado.clientes.find((x) => x.id === turno.clienteId)!;
   const s = estado.servicios.find((x) => x.id === turno.servicioId)!;
   const pr = estado.profesionales.find((x) => x.id === turno.profId)!;
@@ -314,14 +314,15 @@ function Listo({ config, estado, turno, slug, estilo, otra }: { config: DemoConf
   const ctx = { negocio: config.negocio, moneda: config.moneda, direccion: config.direccion, enlaceTurno: enlace };
   return (
     <div className="bar" style={estilo}>
-      <AvisoDemo texto="Servicios, profesionales y turnos de ejemplo" />
+      <AvisoDemo texto={estado.rubro === 'consultorio' ? 'Demo con datos ficticios' : 'Servicios, profesionales y turnos de ejemplo'} />
       <main className="bar-main bar-listo">
         <div className="bar-sello" aria-hidden="true"><Icono nombre="check" size={40} /></div>
         <h1>¡Turno reservado!</h1>
-        <p className="bar-listo-sub">{s.nombre} con {pr.nombre}, {nombreDia(turno.inicio)} a las {hora(turno.inicio)} h.</p>
+        <p className="bar-listo-sub">{s.nombre} con {pr.titulo ? `${pr.titulo} ` : ''}{pr.nombre}, {nombreDia(turno.inicio)} a las {hora(turno.inicio)} h{turno.modalidad === 'video' ? ', por videollamada' : ''}.</p>
         <figure className="bar-wa">
           <figcaption>Te llega este WhatsApp <small>(en la demo lo mostramos acá)</small></figcaption>
           <div className="bar-burbuja">{mensajeConfirmacion(estado, turno, c, ctx)}</div>
+          {estado.rubro === 'consultorio' && <p className="bar-discreto"><Icono nombre="candado" size={14} /> El mensaje no dice con quién ni para qué es el turno.</p>}
         </figure>
         <div className="bar-acciones col">
           <Link className="bar-btn prim grande" href={`/d/${slug}/turno/${turno.token}`}><Icono nombre="calendario" size={18} /> Ver, cambiar o cancelar</Link>
@@ -333,7 +334,7 @@ function Listo({ config, estado, turno, slug, estilo, otra }: { config: DemoConf
   );
 }
 
-function ListaEspera({ estado, servicio, profId, dia, actualizar, onCerrar, onListo }: {
+export function ListaEspera({ estado, servicio, profId, dia, actualizar, onCerrar, onListo }: {
   estado: EstadoAgenda;
   servicio: Servicio;
   profId: string | null;

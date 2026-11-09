@@ -19,7 +19,7 @@ const RUBROS = [
   { id: 'tienda', nombre: 'Tienda', listo: true },
   { id: 'repuestos', nombre: 'Repuestos', listo: true },
   { id: 'barberia', nombre: 'Barbería', listo: true },
-  { id: 'consultorio', nombre: 'Consultorio', listo: false },
+  { id: 'consultorio', nombre: 'Consultorio', listo: true },
   { id: 'ferreteria', nombre: 'Ferretería', listo: false },
 ];
 
@@ -210,7 +210,7 @@ export function PanelVendedor({ usuario }: { usuario: string }) {
             <div className="campo">
               <label htmlFor="wa">WhatsApp del negocio</label>
               <input id="wa" className="inp" inputMode="tel" value={whatsapp} onChange={(e) => setWhatsapp(e.target.value)} placeholder="54 9 11 5555 1234" autoComplete="tel" />
-              <span className="ayuda">Con código de país. Acá llegan los {rubro === 'repuestos' ? 'pedidos de cotización' : rubro === 'barberia' ? 'avisos de turnos' : 'pedidos'} de la demo.</span>
+              <span className="ayuda">Con código de país. Acá llegan los {rubro === 'repuestos' ? 'pedidos de cotización' : rubro === 'barberia' || rubro === 'consultorio' ? 'avisos de turnos' : 'pedidos'} de la demo.</span>
               {errores.whatsapp && <p className="err" role="alert">{errores.whatsapp}</p>}
             </div>
 
@@ -266,7 +266,7 @@ export function PanelVendedor({ usuario }: { usuario: string }) {
 
             {errores.general && <p className="err" role="alert">{errores.general}</p>}
             <button type="submit" className="btn btn-teal" style={{ width: '100%', marginTop: 8 }}>Abrir demo</button>
-            <p className="ayuda" style={{ fontSize: 13, color: 'var(--acm-muted)', marginTop: 10 }}>{rubro === 'barberia' ? 'La agenda trae servicios, profesionales y turnos de ejemplo. En la visita cargás los servicios y horarios del local.' : rubro === 'tienda' ? 'La tienda trae productos, stock y ventas de ejemplo. En la visita podés cargar la planilla del local.' : rubro === 'repuestos' ? 'El catálogo trae piezas y vehículos de ejemplo. En la visita podés cargar la planilla del local.' : 'La carta trae platos de ejemplo. En la visita podés cargar el menú real desde una foto.'}</p>
+            <p className="ayuda" style={{ fontSize: 13, color: 'var(--acm-muted)', marginTop: 10 }}>{rubro === 'consultorio' ? 'El consultorio trae profesionales, coberturas y turnos ficticios. Nunca cargues datos de pacientes reales.' : rubro === 'barberia' ? 'La agenda trae servicios, profesionales y turnos de ejemplo. En la visita cargás los servicios y horarios del local.' : rubro === 'tienda' ? 'La tienda trae productos, stock y ventas de ejemplo. En la visita podés cargar la planilla del local.' : rubro === 'repuestos' ? 'El catálogo trae piezas y vehículos de ejemplo. En la visita podés cargar la planilla del local.' : 'La carta trae platos de ejemplo. En la visita podés cargar el menú real desde una foto.'}</p>
           </form>
 
           <section className="acm-card" aria-labelledby="tus-demos">
@@ -283,7 +283,7 @@ export function PanelVendedor({ usuario }: { usuario: string }) {
                 <div style={{ minWidth: 0 }}>
                   <strong style={{ fontSize: 17, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.negocio}</strong>
                   <span style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
-                    <span className="chip">{{ repuestos: 'Repuestos', restaurante: 'Restaurante', tienda: d.variante === 'almacen' ? 'Almacén' : 'Tienda', barberia: 'Barbería' }[d.rubro]}</span>
+                    <span className="chip">{{ repuestos: 'Repuestos', restaurante: 'Restaurante', tienda: d.variante === 'almacen' ? 'Almacén' : 'Tienda', barberia: 'Barbería', consultorio: 'Consultorio' }[d.rubro]}</span>
                     <span className="chip"><span style={{ width: 10, height: 10, borderRadius: 3, background: d.colorPrincipal, display: 'inline-block' }} /><span style={{ width: 10, height: 10, borderRadius: 3, background: d.colorSecundario, display: 'inline-block' }} /> {d.moneda}</span>
                     <span className="chip">{new Date(d.creada).toLocaleDateString('es')}</span>
                   </span>

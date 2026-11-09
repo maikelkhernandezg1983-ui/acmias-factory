@@ -25,7 +25,7 @@ export function GestionTurno({ slug, token }: { slug: string; token: string }) {
   if (!turno || !servicio) {
     return (
       <div className="bar" style={estilo}>
-        <AvisoDemo texto="Turnos de ejemplo" />
+        <AvisoDemo texto={estado.rubro === 'consultorio' ? 'Demo con datos ficticios' : 'Turnos de ejemplo'} />
         <main className="bar-main bar-listo">
           <h1>No encontramos este turno</h1>
           <p className="bar-listo-sub">Puede que el enlace esté incompleto. Podés reservar uno nuevo.</p>
@@ -43,7 +43,7 @@ export function GestionTurno({ slug, token }: { slug: string; token: string }) {
 
   return (
     <div className="bar" style={estilo}>
-      <AvisoDemo texto="Turnos de ejemplo" />
+      <AvisoDemo texto={estado.rubro === 'consultorio' ? 'Demo con datos ficticios' : 'Turnos de ejemplo'} />
       <header className="bar-mini">
         {config.logo ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -63,7 +63,7 @@ export function GestionTurno({ slug, token }: { slug: string; token: string }) {
           </div>
           <div>
             <strong>{servicio.nombre}</strong>
-            <span>{nombreDia(turno.inicio, new Date(ahora))} a las {hora(turno.inicio)} h · con {prof.nombre}</span>
+            <span>{nombreDia(turno.inicio, new Date(ahora))} a las {hora(turno.inicio)} h · con {prof.titulo ? `${prof.titulo} ` : ''}{prof.nombre}</span>
             <span>{formatoPrecio(servicio.precio, config.moneda)}</span>
             <span className={`bar-estado est-${turno.estado}`}>{NOMBRE_ESTADO[turno.estado]}</span>
           </div>

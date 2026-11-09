@@ -6,12 +6,12 @@ import { useConfigCargada } from '@/components/demo/useDemoCargada';
 import { correrSemanas } from '@/lib/rubros/barberia/datos-ejemplo';
 import type { EstadoAgenda } from '@/lib/rubros/barberia/tipos';
 
-/** Demo de barbería: marca + agenda guardada en el dispositivo. */
+/** Demo con agenda (barbería o consultorio): marca + agenda guardada en el dispositivo. */
 export function useDemoBarberia(slug: string) {
   const { config: c, tema, estilo, listo } = useConfigCargada(slug);
-  const config = c?.rubro === 'barberia' ? c : undefined;
+  const config = c?.rubro === 'barberia' || c?.rubro === 'consultorio' ? c : undefined;
   const [e, actualizar] = useEstadoDe<EstadoAgenda>(slug);
-  const estado = config && e?.rubro === 'barberia' ? e : null;
+  const estado = config && e?.rubro === config.rubro ? e : null;
 
   // Si la demo se abre semanas después de creada, la agenda de ejemplo se corre a la semana actual.
   useEffect(() => {

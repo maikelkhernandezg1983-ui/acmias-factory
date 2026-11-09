@@ -12,6 +12,8 @@ export interface Servicio {
   /** Porcentaje de seña (regla visible; en la demo no se cobra). */
   sena?: number;
   foto?: string;
+  /** Consultorio: se puede hacer por video. */
+  video?: boolean;
 }
 
 export interface Profesional {
@@ -19,6 +21,11 @@ export interface Profesional {
   nombre: string;
   especialidad: string;
   servicios: string[];
+  /** Consultorio: título, matrícula (ficticia), coberturas que acepta y si atiende por video. */
+  titulo?: string;
+  matricula?: string;
+  coberturas?: string[];
+  teleconsulta?: boolean;
 }
 
 export type EstadoTurno = 'reservado' | 'confirmado' | 'atendido' | 'ausente' | 'cancelado';
@@ -34,6 +41,10 @@ export interface Turno {
   estado: EstadoTurno;
   origen: 'online' | 'manual';
   creado: string;
+  /** Consultorio: turno dado por encima de la agenda (se marca distinto). */
+  sobreturno?: boolean;
+  cobertura?: string;
+  modalidad?: 'presencial' | 'video';
   ejemplo?: boolean;
 }
 
@@ -45,6 +56,9 @@ export interface Cliente {
   sellos: number;
   ausencias: number;
   creado: string;
+  /** Consultorio: datos administrativos. Nunca datos clínicos. */
+  cobertura?: string;
+  afiliado?: string;
   ejemplo?: boolean;
 }
 
@@ -73,9 +87,15 @@ export interface EnEspera {
 /** Horario por día de la semana (0 domingo … 6 sábado): [apertura, cierre] en minutos, o null si cierra. */
 export type Horario = Record<number, [number, number] | null>;
 
+export interface Evento {
+  fecha: string;
+  quien: string;
+  accion: string;
+}
+
 export interface EstadoAgenda {
   version: number;
-  rubro: 'barberia';
+  rubro: 'barberia' | 'consultorio';
   servicios: Servicio[];
   profesionales: Profesional[];
   turnos: Turno[];
@@ -88,4 +108,10 @@ export interface EstadoAgenda {
   beneficio: string;
   /** Lunes (YYYY-MM-DD) de la semana en que se generaron los datos de ejemplo. */
   semilla: string;
+  /** Pausa diaria (p. ej. 13 a 15 h), en minutos. */
+  pausa?: [number, number];
+  /** Consultorio: coberturas que trabaja ("Particular" incluida). */
+  coberturas?: string[];
+  /** Consultorio: registro de accesos a fichas (CON-12). */
+  eventos?: Evento[];
 }

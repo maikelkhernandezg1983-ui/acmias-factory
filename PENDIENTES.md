@@ -22,10 +22,11 @@ Actualizado: 9 nov 2026. Marcá con [x] lo que se cierre.
 - [x] Repuestos
 - [x] Tienda con inventario (ropa y almacén)
 - [x] Barbería / salón (reservas en 3 pasos, agenda por profesional, lista de espera, sellos, métricas)
-- [ ] Consultorio médico
+- [x] Consultorio médico (coberturas, mensajes neutros, sobreturnos, ficha administrativa; historia clínica solo como vista previa ficticia)
 - [ ] Ferretería
 
 ## Antes del Demo Day (4 dic 2026)
+- [ ] Historia clínica real (si se decide hacerla): firma digital, consentimiento, conservación legal por país y contrato de encargado de tratamiento. 🔒 Puerta legal antes del primer consultorio real.
 - [ ] Revisión de código y seguridad completa (agentes de QA) sobre los 6 rubros.
 - [ ] Prueba en celulares reales (Android y iPhone), incluido el lector de códigos por cámara.
 - [ ] Guiones de 5 minutos ensayados (están en `docs/demos/`).

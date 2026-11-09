@@ -34,6 +34,7 @@ import { canjearSellos, cambiarEstado, historialCliente, mensajeConfirmacion, me
 import type { Cliente, EnEspera, EstadoAgenda, Turno } from '@/lib/rubros/barberia/tipos';
 import type { DemoConfig } from '@/lib/tipos';
 import { useAhora, useDemoBarberia, type ActualizarAgenda } from './useBarberia';
+import { Pacientes } from '@/components/consultorio/Pacientes';
 
 type Pestana = 'agenda' | 'espera' | 'clientes' | 'bloqueos' | 'metricas' | 'ajustes';
 const iniciales = (n: string) => n.split(' ').map((x) => x[0]).slice(0, 2).join('').toUpperCase();
@@ -43,19 +44,20 @@ export function PanelBarberia({ slug }: { slug: string }) {
   const { config, estado, actualizar, estilo, listo } = useDemoBarberia(slug);
   const [pestana, setPestana] = useState<Pestana>('agenda');
   if (!config || !estado) return <DemoNoEncontrada listo={listo} />;
+  const cons = estado.rubro === 'consultorio';
   const enEspera = estado.espera.filter((x) => !x.avisado).length;
   const avisar = estado.espera.filter((x) => x.avisado).length;
   const PESTANAS: { id: Pestana; nombre: string }[] = [
     { id: 'agenda', nombre: 'Agenda' },
     { id: 'espera', nombre: `Lista de espera${enEspera + avisar ? ` (${enEspera + avisar})` : ''}` },
-    { id: 'clientes', nombre: 'Clientes' },
+    { id: 'clientes', nombre: cons ? 'Pacientes' : 'Clientes' },
     { id: 'bloqueos', nombre: 'Bloqueos y vacaciones' },
     { id: 'metricas', nombre: 'Métricas' },
     { id: 'ajustes', nombre: 'Ajustes' },
   ];
   return (
     <div className="duenio" style={estilo}>
-      <AvisoDemo texto="Servicios, profesionales y turnos de ejemplo" />
+      <AvisoDemo texto={cons ? 'Demo con datos ficticios' : 'Servicios, profesionales y turnos de ejemplo'} />
       <header className="duenio-top">
         <div className="duenio-top-in">
           <div style={{ display: 'flex', alignItems: 'center', gap: 12, minWidth: 0 }}>
@@ -67,7 +69,7 @@ export function PanelBarberia({ slug }: { slug: string }) {
             )}
             <div style={{ minWidth: 0 }}>
               <div style={{ fontWeight: 800, fontSize: 18, whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>{config.negocio}</div>
-              <div style={{ fontSize: 13, opacity: 0.9 }}>Panel del dueño</div>
+              <div style={{ fontSize: 13, opacity: 0.9 }}>{cons ? 'Agenda de la secretaría' : 'Panel del dueño'}</div>
             </div>
           </div>
           <nav style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }} aria-label="Accesos">
@@ -86,7 +88,7 @@ export function PanelBarberia({ slug }: { slug: string }) {
       <main className="d-main" role="tabpanel" id={`pan-${pestana}`} aria-labelledby={`tab-${pestana}`}>
         {pestana === 'agenda' && <Agenda config={config} estado={estado} actualizar={actualizar} slug={slug} />}
         {pestana === 'espera' && <Espera config={config} estado={estado} actualizar={actualizar} slug={slug} />}
-        {pestana === 'clientes' && <Clientes estado={estado} actualizar={actualizar} />}
+        {pestana === 'clientes' && (cons ? <Pacientes estado={estado} actualizar={actualizar} /> : <Clientes estado={estado} actualizar={actualizar} />)}
         {pestana === 'bloqueos' && <Bloqueos estado={estado} actualizar={actualizar} />}
         {pestana === 'metricas' && <Metricas estado={estado} moneda={config.moneda} />}
         {pestana === 'ajustes' && <Ajustes slug={slug} config={config} estado={estado} actualizar={actualizar} />}
@@ -220,6 +222,7 @@ function Linea({ estado, fecha, profs, inicio, fin, ahora, onTurno }: { estado: 
         {profs.map((p) => (
           <div key={p.id} className="ag-col" aria-label={`Turnos de ${p.nombre}`}>
             {horas.map((m) => <span key={m} className="ag-raya" style={{ top: (m - inicio) * K }} />)}
+            {estado.pausa && (() => { const s = pos(estado.pausa[0], estado.pausa[1]); return s.height ? <div className="ag-bloq" style={s}><span>Cerrado</span></div> : null; })()}
             {bloq.filter((b) => b.profId === null || b.profId === p.id).map((b) => {
               const d0 = +conMinutos(fecha, 0);
               const s = pos(Math.max(0, (+new Date(b.desde) - d0) / 60_000), Math.min(1440, (+new Date(b.hasta) - d0) / 60_000));
@@ -230,8 +233,8 @@ function Linea({ estado, fecha, profs, inicio, fin, ahora, onTurno }: { estado: 
               const c = estado.clientes.find((x) => x.id === t.clienteId);
               const st = pos(minutosDe(t.inicio), minutosDe(t.fin));
               return (
-                <button key={t.id} type="button" className={`ag-turno est-${t.estado}${st.height < 50 ? ' corto' : ''}`} style={st} onClick={() => onTurno(t)}>
-                  <span className="ag-t-h">{hora(t.inicio)}</span>
+                <button key={t.id} type="button" className={`ag-turno est-${t.estado}${st.height < 50 ? ' corto' : ''}${t.sobreturno ? ' sobre' : ''}`} style={st} onClick={() => onTurno(t)}>
+                  <span className="ag-t-h">{hora(t.inicio)}{t.sobreturno ? ' · ST' : ''}{t.modalidad === 'video' ? ' · Video' : ''}</span>
                   <span className="ag-t-c">{c?.nombre ?? 'Cliente'}</span>
                   <span className="ag-t-s">{s?.nombre}</span>
                 </button>
@@ -278,7 +281,10 @@ function FichaTurno({ config, estado, turno, actualizar, slug, onCerrar }: { con
         <p style={{ display: 'flex', gap: 8, flexWrap: 'wrap', margin: '0 0 12px' }}>
           <span className={`bar-estado est-${turno.estado}`}>{NOMBRE_ESTADO[turno.estado]}</span>
           <span className="chip-rep">{turno.origen === 'online' ? 'Reservó online' : 'Cargado a mano'}</span>
-          {c && <span className="chip-rep"><Icono nombre="estrella" size={12} /> {c.sellos}/{estado.metaSellos} sellos</span>}
+          {c && estado.rubro === 'barberia' && <span className="chip-rep"><Icono nombre="estrella" size={12} /> {c.sellos}/{estado.metaSellos} sellos</span>}
+          {turno.cobertura && <span className="chip-rep">{turno.cobertura}{c?.afiliado && turno.cobertura === c.cobertura ? ` · ${c.afiliado}` : ''}</span>}
+          {turno.sobreturno && <span className="chip-rep sobre">Sobreturno</span>}
+          {turno.modalidad === 'video' && <span className="chip-rep">Videollamada</span>}
           {c && c.ausencias > 0 && <span className="chip-rep ausencias">{c.ausencias} {c.ausencias === 1 ? 'ausencia' : 'ausencias'}</span>}
         </p>
         {c?.notas && <p className="bar-notas"><Icono nombre="texto" size={16} /> {c.notas}</p>}
@@ -331,9 +337,21 @@ function NuevoTurno({ estado, fecha, actualizar, onCerrar, profInicial }: { esta
   const [nombre, setNombre] = useState('');
   const [wa, setWa] = useState('');
   const [err, setErr] = useState('');
+  const [sobre, setSobre] = useState(false);
+  const cons = estado.rubro === 'consultorio';
+  const [cob, setCob] = useState(cons ? (estado.coberturas?.at(-1) ?? '') : '');
   const s = estado.servicios.find((x) => x.id === sid)!;
   // En el panel se puede cargar a mano un turno de hoy aunque falte poco (walk-in): sin anticipación.
-  const libres = useMemo(() => huecos(estado, s, pid, fecha, Math.min(ahora, +inicioDia(fecha)) - 3_600_000), [estado, s, pid, fecha, ahora]);
+  const libres = useMemo(() => {
+    if (!sobre) return huecos(estado, s, pid, fecha, Math.min(ahora, +inicioDia(fecha)) - 3_600_000);
+    // Sobreturno (CON-07): cualquier horario dentro del día, aunque esté ocupado.
+    const h = estado.horario[fecha.getDay()];
+    const prof = pid ?? estado.profesionales.find((p) => p.servicios.includes(sid))?.id;
+    if (!h || !prof) return [];
+    const res = [];
+    for (let m = h[0]; m + s.duracion <= h[1]; m += 15) res.push({ inicio: +conMinutos(fecha, m), profId: prof });
+    return res;
+  }, [estado, s, sid, pid, fecha, ahora, sobre]);
   const elegido = libres.find((h) => String(h.inicio) === ini) ?? libres[0];
   return (
     <div className="hoja-fondo" onClick={(e) => e.target === e.currentTarget && onCerrar()}>
@@ -348,10 +366,10 @@ function NuevoTurno({ estado, fecha, actualizar, onCerrar, profInicial }: { esta
           onSubmit={(e) => {
             e.preventDefault();
             if (!elegido) return setErr('No hay horarios libres para ese servicio este día.');
-            if (nombre.trim().length < 2) return setErr('Escribí el nombre del cliente.');
+            if (nombre.trim().length < 2) return setErr(cons ? 'Escribí el nombre del paciente.' : 'Escribí el nombre del cliente.');
             let fallo = '';
             const error = actualizar((x) => {
-              const r = reservar(x, { servicioId: sid, profId: elegido.profId, inicio: elegido.inicio, nombre, whatsapp: wa, origen: 'manual' });
+              const r = reservar(x, { servicioId: sid, profId: elegido.profId, inicio: elegido.inicio, nombre, whatsapp: wa, origen: 'manual', sobreturno: sobre, ...(cons && cob ? { cobertura: cob } : {}) });
               if ('error' in r) {
                 fallo = r.error;
                 return x;
@@ -362,31 +380,42 @@ function NuevoTurno({ estado, fecha, actualizar, onCerrar, profInicial }: { esta
             onCerrar();
           }}
         >
-          <label>Servicio
+          <label>{cons ? 'Tipo de consulta' : 'Servicio'}
             <select className="c-inp" value={sid} onChange={(e) => { setSid(e.target.value); setIni(''); }}>
               {estado.servicios.map((x) => <option key={x.id} value={x.id}>{x.nombre} ({x.duracion} min)</option>)}
             </select>
           </label>
           <label>Profesional
             <select className="c-inp" value={pid ?? ''} onChange={(e) => { setPid(e.target.value || null); setIni(''); }}>
-              <option value="">El primero libre</option>
+              {!sobre && <option value="">El primero libre</option>}
               {estado.profesionales.filter((p) => p.servicios.includes(sid)).map((p) => <option key={p.id} value={p.id}>{p.nombre}</option>)}
             </select>
           </label>
+          {cons && <label className="bl-check" style={{ display: 'flex', alignItems: 'center', gap: 8, fontWeight: 600 }}><input type="checkbox" checked={sobre} onChange={(e) => { setSobre(e.target.checked); setIni(''); }} style={{ width: 20, height: 20 }} /> Sobreturno (aunque el horario esté ocupado)</label>}
           <label>Hora
             <select className="c-inp" value={elegido ? String(elegido.inicio) : ''} onChange={(e) => setIni(e.target.value)} disabled={!libres.length}>
               {libres.length ? libres.map((h) => <option key={h.inicio} value={h.inicio}>{hora(new Date(h.inicio))} · {estado.profesionales.find((p) => p.id === h.profId)?.nombre.split(' ')[0]}</option>) : <option>Sin horarios libres</option>}
             </select>
           </label>
-          <label>Cliente
+          <label>{cons ? 'Paciente' : 'Cliente'}
             <input className="c-inp" list="clientes-lista" value={nombre} onChange={(e) => {
               setNombre(e.target.value);
               const c = estado.clientes.find((x) => x.nombre === e.target.value);
-              if (c) setWa(c.whatsapp);
+              if (c) {
+                setWa(c.whatsapp);
+                if (c.cobertura) setCob(c.cobertura);
+              }
             }} />
             <datalist id="clientes-lista">{estado.clientes.map((c) => <option key={c.id} value={c.nombre} />)}</datalist>
           </label>
           <label>WhatsApp (opcional)<input className="c-inp" value={wa} onChange={(e) => setWa(e.target.value)} inputMode="tel" /></label>
+          {cons && (
+            <label>Cobertura
+              <select className="c-inp" value={cob} onChange={(e) => setCob(e.target.value)}>
+                {estado.coberturas?.map((c) => <option key={c}>{c}</option>)}
+              </select>
+            </label>
+          )}
           {err && <p className="bar-err" role="alert">{err}</p>}
           <button type="submit" className="bar-btn prim grande">Guardar turno</button>
         </form>
@@ -597,7 +626,7 @@ function Bloqueos({ estado, actualizar }: { estado: EstadoAgenda; actualizar: Ac
         })}
         {!futuros.length && <li>No hay bloqueos próximos.</li>}
       </ul>
-      {almuerzos > 0 && <p className="sub" style={{ marginTop: 10 }}>Además, Joaquín tiene su horario de almuerzo de 13:30 a 14:30 bloqueado ({almuerzos} días).</p>}
+      {almuerzos > 0 && estado.rubro === 'barberia' && <p className="sub" style={{ marginTop: 10 }}>Además, Joaquín tiene su horario de almuerzo de 13:30 a 14:30 bloqueado ({almuerzos} días).</p>}
     </section>
   );
 }
@@ -617,9 +646,9 @@ function Metricas({ estado, moneda }: { estado: EstadoAgenda; moneda: string }) 
         <div className="met-grid">
           <div className="met"><strong>{pc(m.ocupacionSemana)}</strong><span>Ocupación de la agenda esta semana</span></div>
           <div className="met"><strong>{pc(m.ausencias)}</strong><span>Ausencias ({m.ausentes} de {m.turnos28} turnos)</span></div>
-          <div className="met"><strong>{m.nuevos} / {m.recurrentes}</strong><span>Clientes nuevos / que volvieron</span></div>
+          <div className="met"><strong>{m.nuevos} / {m.recurrentes}</strong><span>{estado.rubro === 'consultorio' ? 'Pacientes nuevos / recurrentes' : 'Clientes nuevos / que volvieron'}</span></div>
           <div className="met"><strong>{pc(m.online)}</strong><span>Turnos reservados online, sin llamar</span></div>
-          <div className="met"><strong>{formatoPrecio(m.ingresos, moneda)}</strong><span>Facturado en servicios (estimado)</span></div>
+          {estado.rubro === 'barberia' && <div className="met"><strong>{formatoPrecio(m.ingresos, moneda)}</strong><span>Facturado en servicios (estimado)</span></div>}
         </div>
       </section>
       <section className="d-card" aria-labelledby="t-occ">
@@ -650,7 +679,7 @@ function Ajustes({ slug, config, estado, actualizar }: { slug: string; config: D
   const h = estado.horario[abiertos[0] ?? 2] ?? [600, 1200];
   return (
     <section className="d-card" aria-labelledby="t-aj">
-      <h2 id="t-aj">Ajustes de la barbería</h2>
+      <h2 id="t-aj">{estado.rubro === 'consultorio' ? 'Ajustes del consultorio' : 'Ajustes de la barbería'}</h2>
       <form
         style={{ display: 'grid', gap: 12, maxWidth: 560 }}
         onSubmit={(e) => {
@@ -669,9 +698,13 @@ function Ajustes({ slug, config, estado, actualizar }: { slug: string; config: D
             const err = actualizar((x) => ({
               ...x,
               horario,
-              metaSellos: Math.min(20, Math.max(3, Math.floor(Number(f.get('meta')) || 10))),
-              beneficio: String(f.get('beneficio') ?? '').trim() || x.beneficio,
-              servicios: x.servicios.map((s) => (s.id === 's-color' ? { ...s, sena: Math.min(100, Math.max(0, Number(f.get('sena')) || 0)) || undefined } : s)),
+              ...(x.rubro === 'barberia'
+                ? {
+                    metaSellos: Math.min(20, Math.max(3, Math.floor(Number(f.get('meta')) || 10))),
+                    beneficio: String(f.get('beneficio') ?? '').trim() || x.beneficio,
+                    servicios: x.servicios.map((s) => (s.id === 's-color' ? { ...s, sena: Math.min(100, Math.max(0, Number(f.get('sena')) || 0)) || undefined } : s)),
+                  }
+                : { pausa: f.get('pausa1') && f.get('pausa2') && aMin(f.get('pausa2')) > aMin(f.get('pausa1')) ? [aMin(f.get('pausa1')), aMin(f.get('pausa2'))] as [number, number] : undefined }),
             }));
             setMsg(err ?? 'Ajustes guardados.');
           } catch (er) {
@@ -691,6 +724,12 @@ function Ajustes({ slug, config, estado, actualizar }: { slug: string; config: D
           <label style={{ display: 'grid', gap: 6, fontWeight: 600 }}>Abre<input name="apertura" type="time" step={900} className="c-inp" defaultValue={hhmm(h[0])} /></label>
           <label style={{ display: 'grid', gap: 6, fontWeight: 600 }}>Cierra<input name="cierre" type="time" step={900} className="c-inp" defaultValue={hhmm(h[1])} /></label>
         </div>
+        {estado.rubro === 'consultorio' ? (
+          <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 12 }}>
+            <label style={{ display: 'grid', gap: 6, fontWeight: 600 }}>Pausa desde<input name="pausa1" type="time" step={900} className="c-inp" defaultValue={estado.pausa ? hhmm(estado.pausa[0]) : ''} /></label>
+            <label style={{ display: 'grid', gap: 6, fontWeight: 600 }}>Pausa hasta<input name="pausa2" type="time" step={900} className="c-inp" defaultValue={estado.pausa ? hhmm(estado.pausa[1]) : ''} /></label>
+          </div>
+        ) : (<>
         <div style={{ display: 'grid', gridTemplateColumns: '1fr 2fr', gap: 12 }}>
           <label style={{ display: 'grid', gap: 6, fontWeight: 600 }}>Sellos para el beneficio<input name="meta" type="number" min={3} max={20} className="c-inp" defaultValue={estado.metaSellos} /></label>
           <label style={{ display: 'grid', gap: 6, fontWeight: 600 }}>Beneficio<input name="beneficio" className="c-inp" defaultValue={estado.beneficio} /></label>
@@ -698,12 +737,29 @@ function Ajustes({ slug, config, estado, actualizar }: { slug: string; config: D
         <label style={{ display: 'grid', gap: 6, fontWeight: 600 }}>Seña para color y mechas (%)<input name="sena" type="number" min={0} max={100} className="c-inp" defaultValue={estado.servicios.find((s) => s.id === 's-color')?.sena ?? 0} />
           <span style={{ fontWeight: 400, fontSize: 13, color: '#55555f' }}>Se muestra al reservar. El cobro real de la seña es un módulo próximamente.</span>
         </label>
+        </>)}
         <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
           <button type="submit" className="d-btn prim">Guardar ajustes</button>
-          <button type="button" className="d-btn" onClick={() => { if (window.confirm('¿Volver a los datos de ejemplo? Se pierden los cambios.')) { reiniciarDatos(slug, config.moneda, 'barberia'); setMsg('La agenda volvió a los datos de ejemplo.'); } }}>Volver a los datos de ejemplo</button>
+          <button type="button" className="d-btn" onClick={() => { if (window.confirm('¿Volver a los datos de ejemplo? Se pierden los cambios.')) { reiniciarDatos(slug, config.moneda, estado.rubro); setMsg('La agenda volvió a los datos de ejemplo.'); } }}>Volver a los datos de ejemplo</button>
         </div>
         {msg && <p role="status" style={{ margin: 0, fontSize: 14 }}>{msg}</p>}
       </form>
+      {estado.rubro === 'consultorio' && <RegistroAccesos estado={estado} />}
     </section>
+  );
+}
+
+function RegistroAccesos({ estado }: { estado: EstadoAgenda }) {
+  const ev = [...(estado.eventos ?? [])].reverse().slice(0, 15);
+  return (
+    <div style={{ marginTop: 24 }}>
+      <h3 style={{ fontSize: 16, margin: '0 0 4px' }}>Registro de accesos a fichas</h3>
+      <p className="sub">Cada vez que alguien abre la ficha de un paciente queda registrado (quién y cuándo).</p>
+      {ev.length ? (
+        <ul className="fc-hist">
+          {ev.map((x, i) => <li key={i}><span>{fechaCorta(new Date(x.fecha))} · {hora(x.fecha)}</span><span>{x.accion}</span><span className="chip-rep">{x.quien}</span></li>)}
+        </ul>
+      ) : <p className="sub">Todavía nadie abrió una ficha.</p>}
+    </div>
   );
 }
