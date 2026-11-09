@@ -8,8 +8,10 @@ import { useCallback, useSyncExternalStore } from 'react';
 import type { DemoConfig, DemoEstado } from './tipos';
 import { crearEstadoInicial } from './rubros/restaurante/datos-ejemplo';
 import { crearEstadoRepuestos } from './rubros/repuestos/datos-ejemplo';
+import { crearEstadoTienda } from './rubros/tienda/datos-ejemplo';
 
 function estadoInicial(config: DemoConfig): unknown {
+  if (config.rubro === 'tienda') return crearEstadoTienda(config.moneda, config.variante);
   return config.rubro === 'repuestos' ? crearEstadoRepuestos(config.moneda) : crearEstadoInicial(config.moneda);
 }
 
@@ -138,8 +140,8 @@ export function borrarDemo(slug: string) {
   window.dispatchEvent(new CustomEvent(EVENTO));
 }
 
-export function reiniciarDatos(slug: string, moneda: string, rubro: DemoConfig['rubro'] = 'restaurante') {
-  escribir(claveEstado(slug), rubro === 'repuestos' ? crearEstadoRepuestos(moneda) : crearEstadoInicial(moneda));
+export function reiniciarDatos(slug: string, moneda: string, rubro: DemoConfig['rubro'] = 'restaurante', variante?: DemoConfig['variante']) {
+  escribir(claveEstado(slug), estadoInicial({ moneda, rubro, variante } as DemoConfig));
 }
 
 export function existeSlug(slug: string) {

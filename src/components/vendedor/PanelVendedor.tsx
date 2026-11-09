@@ -16,7 +16,7 @@ import { Registros } from './Registros';
 
 const RUBROS = [
   { id: 'restaurante', nombre: 'Restaurante', listo: true },
-  { id: 'tienda', nombre: 'Tienda', listo: false },
+  { id: 'tienda', nombre: 'Tienda', listo: true },
   { id: 'repuestos', nombre: 'Repuestos', listo: true },
   { id: 'barberia', nombre: 'Barbería', listo: false },
   { id: 'consultorio', nombre: 'Consultorio', listo: false },
@@ -27,6 +27,7 @@ export function PanelVendedor({ usuario }: { usuario: string }) {
   const demos = useDemos();
   const router = useRouter();
   const [rubro, setRubro] = useState<Rubro>('restaurante');
+  const [variante, setVariante] = useState<'moda' | 'almacen'>('moda');
   const [negocio, setNegocio] = useState('');
   const [logo, setLogo] = useState<string | undefined>();
   const [c1, setC1] = useState('#B3261E');
@@ -78,6 +79,7 @@ export function PanelVendedor({ usuario }: { usuario: string }) {
     const config: DemoConfig = {
       slug: crearSlug(negocio),
       rubro,
+      ...(rubro === 'tienda' ? { variante } : {}),
       negocio: negocio.trim(),
       logo,
       colorPrincipal: c1.toUpperCase(),
@@ -147,6 +149,17 @@ export function PanelVendedor({ usuario }: { usuario: string }) {
                 ))}
               </div>
             </div>
+
+            {rubro === 'tienda' && (
+              <div className="campo">
+                <span className="lbl" id="lbl-variante">Tipo de tienda</span>
+                <div className="rubros" role="group" aria-labelledby="lbl-variante">
+                  <button type="button" className="rubro" aria-pressed={variante === 'moda'} onClick={() => setVariante('moda')}>Ropa y regalos</button>
+                  <button type="button" className="rubro" aria-pressed={variante === 'almacen'} onClick={() => setVariante('almacen')}>Almacén</button>
+                </div>
+                <span className="ayuda">Almacén suma vencimientos por lote.</span>
+              </div>
+            )}
 
             <div className="campo">
               <label htmlFor="negocio">Nombre del negocio</label>
@@ -253,7 +266,7 @@ export function PanelVendedor({ usuario }: { usuario: string }) {
 
             {errores.general && <p className="err" role="alert">{errores.general}</p>}
             <button type="submit" className="btn btn-teal" style={{ width: '100%', marginTop: 8 }}>Abrir demo</button>
-            <p className="ayuda" style={{ fontSize: 13, color: 'var(--acm-muted)', marginTop: 10 }}>{rubro === 'repuestos' ? 'El catálogo trae piezas y vehículos de ejemplo. En la visita podés cargar la planilla del local.' : 'La carta trae platos de ejemplo. En la visita podés cargar el menú real desde una foto.'}</p>
+            <p className="ayuda" style={{ fontSize: 13, color: 'var(--acm-muted)', marginTop: 10 }}>{rubro === 'tienda' ? 'La tienda trae productos, stock y ventas de ejemplo. En la visita podés cargar la planilla del local.' : rubro === 'repuestos' ? 'El catálogo trae piezas y vehículos de ejemplo. En la visita podés cargar la planilla del local.' : 'La carta trae platos de ejemplo. En la visita podés cargar el menú real desde una foto.'}</p>
           </form>
 
           <section className="acm-card" aria-labelledby="tus-demos">
@@ -270,7 +283,7 @@ export function PanelVendedor({ usuario }: { usuario: string }) {
                 <div style={{ minWidth: 0 }}>
                   <strong style={{ fontSize: 17, display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{d.negocio}</strong>
                   <span style={{ display: 'flex', gap: 6, flexWrap: 'wrap', marginTop: 6 }}>
-                    <span className="chip">{d.rubro === 'repuestos' ? 'Repuestos' : 'Restaurante'}</span>
+                    <span className="chip">{{ repuestos: 'Repuestos', restaurante: 'Restaurante', tienda: d.variante === 'almacen' ? 'Almacén' : 'Tienda' }[d.rubro]}</span>
                     <span className="chip"><span style={{ width: 10, height: 10, borderRadius: 3, background: d.colorPrincipal, display: 'inline-block' }} /><span style={{ width: 10, height: 10, borderRadius: 3, background: d.colorSecundario, display: 'inline-block' }} /> {d.moneda}</span>
                     <span className="chip">{new Date(d.creada).toLocaleDateString('es')}</span>
                   </span>
@@ -278,6 +291,7 @@ export function PanelVendedor({ usuario }: { usuario: string }) {
                 <div className="demo-acciones">
                   <Link className="btn btn-teal btn-chico" href={`/d/${d.slug}`}>Abrir demo</Link>
                   <Link className="btn btn-linea btn-chico" href={`/d/${d.slug}/panel`}>Panel del dueño</Link>
+                  {d.rubro === 'tienda' && <Link className="btn btn-linea btn-chico" href={`/d/${d.slug}/mostrador`}>Mostrador</Link>}
                   <Link className="btn btn-linea btn-chico" href={`/d/${d.slug}/sitio`}>Sitio</Link>
                   <button type="button" className="btn btn-linea btn-chico" onClick={() => setCompartir(d)}><Icono nombre="qr" size={16} /> Compartir</button>
                   <button

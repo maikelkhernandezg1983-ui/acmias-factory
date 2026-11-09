@@ -6,6 +6,9 @@ import { Sitio } from './Sitio';
 import { Catalogo } from '@/components/repuestos/Catalogo';
 import { PanelRepuestos } from '@/components/repuestos/PanelRepuestos';
 import { SitioRepuestos } from '@/components/repuestos/SitioRepuestos';
+import { Tienda } from '@/components/tienda/Tienda';
+import { PanelTienda } from '@/components/tienda/PanelTienda';
+import { SitioTienda } from '@/components/tienda/SitioTienda';
 import { DemoNoEncontrada, useConfigCargada } from './useDemoCargada';
 
 type Vista = 'cliente' | 'panel' | 'sitio';
@@ -13,6 +16,7 @@ type Vista = 'cliente' | 'panel' | 'sitio';
 const VISTAS = {
   restaurante: { cliente: Carta, panel: PanelDuenio, sitio: Sitio },
   repuestos: { cliente: Catalogo, panel: PanelRepuestos, sitio: SitioRepuestos },
+  tienda: { cliente: Tienda, panel: PanelTienda, sitio: SitioTienda },
 } as const;
 
 /** Abre la pantalla que corresponde al rubro de la demo. */
@@ -25,12 +29,12 @@ export function PorRubro({ slug, vista }: { slug: string; vista: Vista }) {
   return <Componente slug={slug} />;
 }
 
-function leerRubroDelEnlace(): 'restaurante' | 'repuestos' {
+function leerRubroDelEnlace(): keyof typeof VISTAS {
   try {
     const m = window.location.hash.match(/c=([A-Za-z0-9_-]+)/);
     if (!m) return 'restaurante';
     const json = JSON.parse(decodeURIComponent(escape(atob(m[1].replace(/-/g, '+').replace(/_/g, '/')))));
-    return json?.rubro === 'repuestos' ? 'repuestos' : 'restaurante';
+    return json?.rubro in VISTAS ? json.rubro : 'restaurante';
   } catch {
     return 'restaurante';
   }

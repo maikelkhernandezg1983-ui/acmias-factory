@@ -54,14 +54,16 @@ export interface Pedido {
   ejemplo?: boolean;
 }
 
-export type Rubro = 'restaurante' | 'repuestos';
-export const RUBROS_LISTOS: Rubro[] = ['restaurante', 'repuestos'];
+export type Rubro = 'restaurante' | 'repuestos' | 'tienda';
+export const RUBROS_LISTOS: Rubro[] = ['restaurante', 'repuestos', 'tienda'];
 
 export interface DemoConfig {
   slug: string;
   rubro: Rubro;
   /** Registro del cliente (formulario de la web) del que salió la demo. */
   registroId?: string;
+  /** Tienda: ropa y regalos o almacén (con vencimientos). */
+  variante?: 'moda' | 'almacen';
   negocio: string;
   logo?: string;
   colorPrincipal: string;

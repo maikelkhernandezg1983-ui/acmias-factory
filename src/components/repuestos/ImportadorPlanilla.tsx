@@ -36,7 +36,7 @@ function leerCsv(texto: string): string[][] {
   return filas;
 }
 
-async function leerArchivo(f: File): Promise<string[][]> {
+export async function leerArchivo(f: File): Promise<string[][]> {
   const nombre = f.name.toLowerCase();
   if (nombre.endsWith('.xlsx')) {
     const { readSheet } = await import('read-excel-file/browser');
