@@ -12,8 +12,10 @@ import { crearEstadoTienda } from './rubros/tienda/datos-ejemplo';
 import { crearEstadoBarberia } from './rubros/barberia/datos-ejemplo';
 import { crearEstadoConsultorio } from './rubros/consultorio/datos-ejemplo';
 import { crearEstadoFerreteria } from './rubros/ferreteria/datos-ejemplo';
+import { crearEstadoAutos } from './rubros/autos/datos-ejemplo';
 
 function estadoInicial(config: DemoConfig): unknown {
+  if (config.rubro === 'autos') return crearEstadoAutos(config.moneda);
   if (config.rubro === 'ferreteria') return crearEstadoFerreteria(config.moneda);
   if (config.rubro === 'consultorio') return crearEstadoConsultorio(config.moneda);
   if (config.rubro === 'barberia') return crearEstadoBarberia(config.moneda);

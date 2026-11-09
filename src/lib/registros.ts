@@ -10,7 +10,7 @@ import { z } from 'zod';
  * Sin base, en desarrollo y pruebas, se usa una memoria local con registros ficticios.
  */
 
-export const RUBROS_REGISTRO = ['restaurante', 'repuestos', 'tienda', 'barberia', 'consultorio', 'ferreteria'] as const;
+export const RUBROS_REGISTRO = ['restaurante', 'repuestos', 'tienda', 'barberia', 'consultorio', 'ferreteria', 'autos'] as const;
 const HEX = /^#[0-9A-Fa-f]{6}$/;
 const LOGO = /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/;
 export const MAX_LOGO = 400_000; // caracteres del data URL (~300 KB de imagen)
@@ -70,6 +70,7 @@ function asegurarTabla() {
 const memoria: Registro[] = [
   { id: 'r-ejemplo-1', negocio: 'Trattoria Don Bruno', rubro: 'restaurante', colorPrincipal: '#1F5135', colorSecundario: '#E9B44C', whatsapp: '5491155550001', email: 'demo@ejemplo.com', caso: 'Quieren la carta con QR por mesa y pedidos por WhatsApp.', creado: '2026-11-06T14:10:00.000Z', ejemplo: true },
   { id: 'r-ejemplo-2', negocio: 'La Parrilla del Puerto', rubro: 'restaurante', colorPrincipal: '#7A1F1F', colorSecundario: '#F2C14E', whatsapp: '5491155550002', email: 'demo@ejemplo.com', caso: 'Delivery propio y subir precios rápido.', creado: '2026-11-07T19:25:00.000Z', ejemplo: true },
+  { id: 'r-ejemplo-7', negocio: 'Motores del Sur', rubro: 'autos', colorPrincipal: '#14161A', colorSecundario: '#E8590C', whatsapp: '5491155550007', email: 'demo@ejemplo.com', caso: 'Que las consultas lleguen con el auto, la cuota y el usado ya cargados.', creado: '2026-11-09T22:00:00.000Z', ejemplo: true },
   { id: 'r-ejemplo-6', negocio: 'Ferretería El Tornillo Feliz', rubro: 'ferreteria', colorPrincipal: '#E2571E', colorSecundario: '#1F2A44', whatsapp: '5491155550006', email: 'demo@ejemplo.com', caso: 'Contestar rápido las listas que mandan los plomeros por WhatsApp.', creado: '2026-11-09T12:20:00.000Z', ejemplo: true },
   { id: 'r-ejemplo-5', negocio: 'Consultorio Integral Sur', rubro: 'consultorio', colorPrincipal: '#0F5F73', colorSecundario: '#9ED8C9', whatsapp: '5491155550005', email: 'demo@ejemplo.com', caso: 'Menos ausencias y que la secretaria no confirme a mano.', creado: '2026-11-09T11:30:00.000Z', ejemplo: true },
   { id: 'r-ejemplo-4', negocio: 'Barbería El Faro', rubro: 'barberia', colorPrincipal: '#1D2B3A', colorSecundario: '#C8963E', whatsapp: '5491155550004', email: 'demo@ejemplo.com', caso: 'Turnos online sin llamadas y menos ausencias.', creado: '2026-11-09T09:40:00.000Z', ejemplo: true },
