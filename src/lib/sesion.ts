@@ -18,15 +18,19 @@ const DEV_VENDEDORES = 'vendedor=pbkdf2$1000$ZGVtby1zYWw$' + pbkdf2Sync('demo123
 function vendedores(): Map<string, string> {
   const crudo = process.env.VENDEDORES ?? (produccion ? '' : DEV_VENDEDORES);
   const m = new Map<string, string>();
-  for (const par of crudo.split(';')) {
+  // Tolera errores comunes al pegar en Vercel: comillas, espacios, saltos de línea o el nombre "VENDEDORES=" incluido.
+  const limpio = crudo.trim().replace(/^VENDEDORES\s*=\s*/i, '');
+  for (const entrada of limpio.split(/[;\n,]+/)) {
+    const par = entrada.trim().replace(/^["'`]+|["'`]+$/g, '');
     const i = par.indexOf('=');
-    if (i > 0) m.set(par.slice(0, i).trim().toLowerCase(), par.slice(i + 1).trim());
+    if (i > 0) m.set(par.slice(0, i).trim().toLowerCase(), par.slice(i + 1).trim().replace(/\s+/g, ''));
   }
   return m;
 }
 
 function secreto() {
-  return process.env.SESION_SECRETO ?? (produccion ? '' : 'secreto-solo-para-desarrollo');
+  const v = process.env.SESION_SECRETO?.trim().replace(/^SESION_SECRETO\s*=\s*/i, '').replace(/^["'`]+|["'`]+$/g, '');
+  return v || (produccion ? '' : 'secreto-solo-para-desarrollo');
 }
 
 /** Qué falta configurar en Vercel para poder ingresar (vacío si está todo). */
