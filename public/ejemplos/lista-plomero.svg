@@ -1,0 +1,27 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 600 760" role="img" aria-label="Foto ilustrativa de una lista escrita a mano: 3 caños de 50, 6 codos, 1 pegamento, 20 m cable 2,5">
+  <defs>
+    <pattern id="renglon" width="600" height="56" patternUnits="userSpaceOnUse">
+      <line x1="0" y1="55" x2="600" y2="55" stroke="#9cc4e4" stroke-width="2"/>
+    </pattern>
+    <filter id="sombra" x="-10%" y="-10%" width="120%" height="120%">
+      <feDropShadow dx="0" dy="10" stdDeviation="14" flood-color="#000" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+  <rect width="600" height="760" fill="#3b3a36"/>
+  <g transform="rotate(-3 300 380)" filter="url(#sombra)">
+    <rect x="70" y="40" width="460" height="680" rx="6" fill="#fbfaf4"/>
+    <rect x="70" y="40" width="460" height="680" rx="6" fill="url(#renglon)" opacity="0.9"/>
+    <line x1="130" y1="40" x2="130" y2="720" stroke="#e8a3a3" stroke-width="2"/>
+    <g fill="none" stroke="#c9c6bb" stroke-width="2">
+      <circle cx="95" cy="110" r="9"/><circle cx="95" cy="380" r="9"/><circle cx="95" cy="650" r="9"/>
+    </g>
+    <g font-family="'Segoe Print','Bradley Hand','Comic Sans MS','Chalkboard SE',cursive" fill="#1f3a8a">
+      <text x="150" y="150" font-size="30" transform="rotate(-1 150 150)">Obra Gómez · baño</text>
+      <text x="150" y="262" font-size="38" transform="rotate(1 150 262)">3 caños de 50</text>
+      <text x="150" y="374" font-size="38" transform="rotate(-1.5 150 374)">6 codos</text>
+      <text x="150" y="486" font-size="38" transform="rotate(0.8 150 486)">1 pegamento</text>
+      <text x="150" y="598" font-size="38" transform="rotate(-0.6 150 598)">20 m cable 2,5</text>
+      <text x="400" y="690" font-size="30" transform="rotate(-4 400 690)">Juan</text>
+    </g>
+  </g>
+</svg>

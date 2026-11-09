@@ -3,7 +3,7 @@
 Actualizado: 9 nov 2026. Marcá con [x] lo que se cierre.
 
 ## Lo que tiene que hacer el fundador (necesita su cuenta o sus claves)
-- [ ] **Clave de IA**: cargar `ANTHROPIC_API_KEY` en Vercel (proyecto `acmias-factory` → Settings → Environment Variables) y hacer Redeploy. Activa: importar menú desde foto (restaurante) y cargar planilla (repuestos y tienda).
+- [ ] **Clave de IA**: cargar `ANTHROPIC_API_KEY` en Vercel (proyecto `acmias-factory` → Settings → Environment Variables) y hacer Redeploy. Activa: importar menú desde foto (restaurante), cargar planilla (repuestos y tienda) y leer fotos de listas (ferretería).
 - [ ] **Base de datos**: en Vercel → Storage → Neon → Create (acepta condiciones y facturación). Después avisar para conectar.
 - [ ] **Dominio**: comprar `acmias.com` (≈ USD 12/año) y apuntarlo a Vercel (nameservers de Vercel para los subdominios `*.demo.acmias.com`).
 - [ ] **Usuarios de vendedores**: sumar uno por vendedor en `/ingresar/generar` y unirlos en `VENDEDORES` con `;`.
@@ -23,7 +23,7 @@ Actualizado: 9 nov 2026. Marcá con [x] lo que se cierre.
 - [x] Tienda con inventario (ropa y almacén)
 - [x] Barbería / salón (reservas en 3 pasos, agenda por profesional, lista de espera, sellos, métricas)
 - [x] Consultorio médico (coberturas, mensajes neutros, sobreturnos, ficha administrativa; historia clínica solo como vista previa ficticia)
-- [ ] Ferretería
+- [x] Ferretería (3.100 productos, sinónimos, cotizador desde texto o foto, listas de precios, presupuestos y reposición)
 
 ## Antes del Demo Day (4 dic 2026)
 - [ ] Historia clínica real (si se decide hacerla): firma digital, consentimiento, conservación legal por país y contrato de encargado de tratamiento. 🔒 Puerta legal antes del primer consultorio real.

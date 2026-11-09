@@ -14,6 +14,9 @@ import { PanelBarberia } from '@/components/barberia/PanelBarberia';
 import { SitioBarberia } from '@/components/barberia/SitioBarberia';
 import { ReservaConsultorio } from '@/components/consultorio/ReservaConsultorio';
 import { SitioConsultorio } from '@/components/consultorio/SitioConsultorio';
+import { CatalogoFer } from '@/components/ferreteria/CatalogoFer';
+import { PanelFerreteria } from '@/components/ferreteria/PanelFerreteria';
+import { SitioFer } from '@/components/ferreteria/SitioFer';
 import { DemoNoEncontrada, useConfigCargada } from './useDemoCargada';
 
 type Vista = 'cliente' | 'panel' | 'sitio';
@@ -24,6 +27,7 @@ const VISTAS = {
   tienda: { cliente: Tienda, panel: PanelTienda, sitio: SitioTienda },
   barberia: { cliente: Reserva, panel: PanelBarberia, sitio: SitioBarberia },
   consultorio: { cliente: ReservaConsultorio, panel: PanelBarberia, sitio: SitioConsultorio },
+  ferreteria: { cliente: CatalogoFer, panel: PanelFerreteria, sitio: SitioFer },
 } as const;
 
 /** Abre la pantalla que corresponde al rubro de la demo. */
