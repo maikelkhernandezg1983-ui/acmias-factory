@@ -15,8 +15,9 @@ const NOMBRE_RUBRO: Record<Registro['rubro'], string> = {
   consultorio: 'Consultorio',
   ferreteria: 'Ferretería',
   autos: 'Autos y motos',
+  inmobiliaria: 'Inmobiliaria',
 };
-const RUBROS_LISTOS: Registro['rubro'][] = ['restaurante', 'repuestos', 'tienda', 'barberia', 'consultorio', 'ferreteria', 'autos'];
+const RUBROS_LISTOS: Registro['rubro'][] = ['restaurante', 'repuestos', 'tienda', 'barberia', 'consultorio', 'ferreteria', 'autos', 'inmobiliaria'];
 
 type Vista = { tipo: 'cargando' } | { tipo: 'clave' } | { tipo: 'error'; texto: string } | { tipo: 'lista'; registros: Registro[] };
 
