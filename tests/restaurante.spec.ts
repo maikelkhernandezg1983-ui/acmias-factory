@@ -163,6 +163,8 @@ test('la landing registra un cliente y aparece en el panel', async ({ page, requ
   expect(sinAceptar.status()).toBe(422);
   const ok = await request.post('/api/registros', { data: base, headers: { origin: 'https://acmias-landing-demo-bmhi.vercel.app' } });
   expect(ok.status()).toBe(201);
+  // Sin claves de Resend ni CallMeBot no se avisa a nadie, pero la solicitud se guarda igual.
+  expect((await ok.json()).avisado).toBe(false);
   expect(ok.headers()['access-control-allow-origin']).toBe('https://acmias-landing-demo-bmhi.vercel.app');
   await ingresar(page);
   await page.getByRole('button', { name: `Ver demo de ${nombre}` }).click();

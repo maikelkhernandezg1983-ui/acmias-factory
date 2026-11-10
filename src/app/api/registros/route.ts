@@ -1,9 +1,11 @@
 import { NextResponse, type NextRequest } from 'next/server';
 import { vendedorActual } from '@/lib/sesion';
-import { crearRegistro, listarRegistros, MAX_LOGO, NuevoRegistro } from '@/lib/registros';
+import { z } from 'zod';
+import { avisarSolicitud } from '@/lib/avisos';
+import { armarRegistro, crearRegistro, listarRegistros, MAX_LOGO, NuevoRegistro, type Registro } from '@/lib/registros';
 
 /** Orígenes que pueden enviar solicitudes (la landing). Separados por coma en LANDING_ORIGENES. */
-const ORIGENES = (process.env.LANDING_ORIGENES ?? 'https://acmias-landing-demo-bmhi.vercel.app,https://acmias.com,https://www.acmias.com')
+const ORIGENES = (process.env.LANDING_ORIGENES ?? 'https://acmias-landing-demo-bmhi.vercel.app,https://acmias-landing-demo.vercel.app,https://acmias.com,https://www.acmias.com')
   .split(',')
   .map((o) => o.trim())
   .filter(Boolean);
@@ -50,15 +52,25 @@ export async function POST(req: NextRequest) {
   limite.set(ip, { ...reg, n: reg.n + 1 });
 
   if (Number(req.headers.get('content-length') ?? 0) > MAX_LOGO + 20_000) return NextResponse.json({ error: 'El logo pesa demasiado. Probá con uno más liviano.' }, { status: 413, headers: h });
-  const datos = NuevoRegistro.safeParse(await req.json().catch(() => null));
+  const cuerpo = await req.json().catch(() => null);
+  const datos = NuevoRegistro.safeParse(cuerpo);
   if (!datos.success) {
     const campos = [...new Set(datos.error.issues.map((i) => String(i.path[0] ?? '')))].filter(Boolean);
     return NextResponse.json({ error: 'Revisá los datos del formulario.', campos }, { status: 422, headers: h });
   }
+  // Rubro tal como lo eligió en la landing ("Otro"…), solo para el aviso.
+  const rubroIndicado = z.string().trim().max(60).optional().catch(undefined).parse((cuerpo as { rubroIndicado?: unknown })?.rubroIndicado);
+  let registro: Registro;
+  let guardado = true;
   try {
-    const r = await crearRegistro(datos.data);
-    return NextResponse.json({ ok: true, id: r.id }, { status: 201, headers: h });
+    registro = await crearRegistro(datos.data);
   } catch {
-    return NextResponse.json({ error: 'No pudimos guardar tu solicitud. Probá de nuevo en unos minutos.' }, { status: 502, headers: h });
+    guardado = false;
+    registro = armarRegistro(datos.data);
   }
+  // El aviso por mail y WhatsApp al equipo nunca hace fallar el formulario.
+  const avisos = await avisarSolicitud(registro, rubroIndicado).catch(() => ({ mail: 'error', whatsapp: 'error' }));
+  const avisado = avisos.mail === 'ok' || avisos.whatsapp === 'ok' || avisos.whatsapp === 'parcial';
+  if (!guardado && !avisado) return NextResponse.json({ error: 'No pudimos guardar tu solicitud. Probá de nuevo en unos minutos.' }, { status: 502, headers: h });
+  return NextResponse.json({ ok: true, id: registro.id, avisado }, { status: 201, headers: h });
 }

@@ -103,8 +103,9 @@ export async function listarRegistros(): Promise<Registro[]> {
   }));
 }
 
-export async function crearRegistro(datos: NuevoRegistro): Promise<Registro> {
-  const r: Registro = {
+/** Arma el registro (con id nuevo) sin guardarlo. */
+export function armarRegistro(datos: NuevoRegistro): Registro {
+  return {
     id: idNuevo(),
     negocio: datos.negocio,
     rubro: datos.rubro,
@@ -116,6 +117,10 @@ export async function crearRegistro(datos: NuevoRegistro): Promise<Registro> {
     caso: datos.caso,
     creado: new Date().toISOString(),
   };
+}
+
+export async function crearRegistro(datos: NuevoRegistro): Promise<Registro> {
+  const r = armarRegistro(datos);
   if (!sql) {
     memoria.unshift(r);
     return r;
