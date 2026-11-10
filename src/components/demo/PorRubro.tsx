@@ -23,6 +23,9 @@ import { SitioAutos } from '@/components/autos/SitioAutos';
 import { CatalogoInmo } from '@/components/inmobiliaria/CatalogoInmo';
 import { PanelInmo } from '@/components/inmobiliaria/PanelInmo';
 import { SitioInmo } from '@/components/inmobiliaria/SitioInmo';
+import { PortalCliente } from '@/components/contador/PortalCliente';
+import { PanelContador } from '@/components/contador/PanelContador';
+import { SitioContador } from '@/components/contador/SitioContador';
 import { DemoNoEncontrada, useConfigCargada } from './useDemoCargada';
 
 type Vista = 'cliente' | 'panel' | 'sitio';
@@ -36,6 +39,7 @@ const VISTAS = {
   ferreteria: { cliente: CatalogoFer, panel: PanelFerreteria, sitio: SitioFer },
   autos: { cliente: Concesionaria, panel: PanelAutos, sitio: SitioAutos },
   inmobiliaria: { cliente: CatalogoInmo, panel: PanelInmo, sitio: SitioInmo },
+  contador: { cliente: PortalCliente, panel: PanelContador, sitio: SitioContador },
 } as const;
 
 /** Abre la pantalla que corresponde al rubro de la demo. */

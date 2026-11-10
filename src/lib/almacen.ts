@@ -14,8 +14,10 @@ import { crearEstadoConsultorio } from './rubros/consultorio/datos-ejemplo';
 import { crearEstadoFerreteria } from './rubros/ferreteria/datos-ejemplo';
 import { crearEstadoAutos } from './rubros/autos/datos-ejemplo';
 import { crearEstadoInmo } from './rubros/inmobiliaria/datos-ejemplo';
+import { crearEstadoContador } from './rubros/contador/datos-ejemplo';
 
 function estadoInicial(config: DemoConfig): unknown {
+  if (config.rubro === 'contador') return crearEstadoContador(config.moneda);
   if (config.rubro === 'inmobiliaria') return crearEstadoInmo(config.moneda);
   if (config.rubro === 'autos') return crearEstadoAutos(config.moneda);
   if (config.rubro === 'ferreteria') return crearEstadoFerreteria(config.moneda);

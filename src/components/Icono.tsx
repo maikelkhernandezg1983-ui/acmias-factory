@@ -1,6 +1,6 @@
 type Nombre =
   | 'mas' | 'menos' | 'cerrar' | 'whatsapp' | 'carrito' | 'reloj' | 'subir' | 'qr' | 'imprimir'
-  | 'editar' | 'basura' | 'ojo' | 'chispa' | 'atras' | 'texto' | 'check' | 'deshacer' | 'enlace' | 'tienda' | 'grafico' | 'llave' | 'buscar' | 'lista' | 'info' | 'planilla' | 'calendario' | 'tijera' | 'usuario' | 'candado' | 'estrella' | 'telefono' | 'ubicacion' | 'casa';
+  | 'editar' | 'basura' | 'ojo' | 'ojoNo' | 'chispa' | 'atras' | 'texto' | 'check' | 'deshacer' | 'enlace' | 'tienda' | 'grafico' | 'llave' | 'buscar' | 'lista' | 'info' | 'planilla' | 'calendario' | 'tijera' | 'usuario' | 'candado' | 'estrella' | 'telefono' | 'ubicacion' | 'casa';
 
 const P: Record<Nombre, React.ReactNode> = {
   mas: <path d="M12 5v14M5 12h14" />,
@@ -91,6 +91,7 @@ const P: Record<Nombre, React.ReactNode> = {
       <circle cx="12" cy="12" r="3" />
     </>
   ),
+  ojoNo: <path d="M3 3l18 18M10.6 5.1A10 10 0 0 1 12 5c6 0 10 7 10 7a17 17 0 0 1-3.2 3.9M6.6 6.6C3.8 8.4 2 12 2 12s4 7 10 7a9.6 9.6 0 0 0 5.4-1.6M9.9 9.9a3 3 0 0 0 4.2 4.2" />,
   chispa: <path d="M12 3l1.8 5.2L19 10l-5.2 1.8L12 17l-1.8-5.2L5 10l5.2-1.8zM19 16l.8 2.2L22 19l-2.2.8L19 22l-.8-2.2L16 19l2.2-.8z" />,
   atras: <path d="M15 18l-6-6 6-6" />,
   texto: <path d="M4 7V5h10v2M9 5v14M7 19h4M14 13v-1h6v1M17 12v7M16 19h2" />,

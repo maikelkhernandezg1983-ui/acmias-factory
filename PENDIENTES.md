@@ -21,6 +21,7 @@ Actualizado: 10 nov 2026. Marcá con [x] lo que se cierre.
 - [ ] Ferretería: con la clave de IA, probar la lectura de fotos con 20 listas reales del primer cliente antes de activarla (puerta del rubro).
 - [ ] Autos y motos: módulo de fotos reales por vehículo (hoy ilustraciones) y BRD-07 a validar con una agencia real.
 - [ ] Inmobiliaria: fotos reales y recorrido virtual, mapa real; BRD-08 a validar con la inmobiliaria del vendedor (garantías, honorarios y normativa de alquiler de su zona).
+- [ ] Estudio contable: validar BRD-09 con el contador (columnas de su Excel, tareas por mes, vencimientos). 🔒 Antes del primer estudio real: claves fiscales cifradas, permisos y registro de quién las ve, revisión legal de la custodia.
 - [ ] Semáforo de stock: hoy los límites son en unidades y valen para todo el negocio. Si un cliente lo pide, sumar límites por categoría (en la ferretería no es lo mismo 3 térmicas que 3 tornillos).
 - [ ] Fotos: restaurante y tienda usan fotos libres de Unsplash; repuestos usa ilustraciones (las fotos libres mostraban marcas reales).
 
@@ -33,6 +34,7 @@ Actualizado: 10 nov 2026. Marcá con [x] lo que se cierre.
 - [x] Ferretería (3.100 productos, sinónimos, cotizador desde texto o foto, listas de precios, presupuestos y reposición)
 - [x] Autos y motos (rubro nuevo: stock con ilustraciones, cuota estimada, usado para tasar, prueba de manejo, consultas completas por WhatsApp)
 - [x] Inmobiliaria (rubro nuevo: alquiler, venta y temporario de 8 tipos de propiedad, costo de ingreso estimado, visitas agendadas, captación de propietarios)
+- [x] Estudio contable (rubro nuevo: importación de 280 clientes desde Excel, claves con ojito y registro, historial de pagos con confirmación manual, tareas del mes en orden con aviso por WhatsApp, deudas y tablero de ingresos)
 - [x] Semáforo de stock (Tienda, Ferretería y Repuestos): rojo, amarillo y verde en unidades, configurable en Ajustes, con filtro por color en el panel.
 
 ## Antes del Demo Day (4 dic 2026)

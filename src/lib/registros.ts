@@ -10,7 +10,7 @@ import { z } from 'zod';
  * Sin base, en desarrollo y pruebas, se usa una memoria local con registros ficticios.
  */
 
-export const RUBROS_REGISTRO = ['restaurante', 'repuestos', 'tienda', 'barberia', 'consultorio', 'ferreteria', 'autos', 'inmobiliaria'] as const;
+export const RUBROS_REGISTRO = ['restaurante', 'repuestos', 'tienda', 'barberia', 'consultorio', 'ferreteria', 'autos', 'inmobiliaria', 'contador'] as const;
 const HEX = /^#[0-9A-Fa-f]{6}$/;
 const LOGO = /^data:image\/(png|jpeg|webp);base64,[A-Za-z0-9+/=]+$/;
 export const MAX_LOGO = 400_000; // caracteres del data URL (~300 KB de imagen)
@@ -70,6 +70,7 @@ function asegurarTabla() {
 const memoria: Registro[] = [
   { id: 'r-ejemplo-1', negocio: 'Trattoria Don Bruno', rubro: 'restaurante', colorPrincipal: '#1F5135', colorSecundario: '#E9B44C', whatsapp: '5491155550001', email: 'demo@ejemplo.com', caso: 'Quieren la carta con QR por mesa y pedidos por WhatsApp.', creado: '2026-11-06T14:10:00.000Z', ejemplo: true },
   { id: 'r-ejemplo-2', negocio: 'La Parrilla del Puerto', rubro: 'restaurante', colorPrincipal: '#7A1F1F', colorSecundario: '#F2C14E', whatsapp: '5491155550002', email: 'demo@ejemplo.com', caso: 'Delivery propio y subir precios rápido.', creado: '2026-11-07T19:25:00.000Z', ejemplo: true },
+  { id: 'r-ejemplo-9', negocio: 'Estudio Contable Ribera', rubro: 'contador', colorPrincipal: '#1E2A44', colorSecundario: '#3FA796', whatsapp: '5491155550009', email: 'demo@ejemplo.com', caso: 'Tengo 280 clientes en un Excel: quiero saber quién pagó, a quién ya le presenté la declaración y avisarles por WhatsApp sin perder el orden.', creado: '2026-11-10T20:30:00.000Z', ejemplo: true },
   { id: 'r-ejemplo-8', negocio: 'Propiedades del Parque', rubro: 'inmobiliaria', colorPrincipal: '#1F3B33', colorSecundario: '#E3B23C', whatsapp: '5491155550008', email: 'demo@ejemplo.com', caso: 'Que las consultas lleguen con el código de la propiedad y la visita ya agendada.', creado: '2026-11-09T23:30:00.000Z', ejemplo: true },
   { id: 'r-ejemplo-7', negocio: 'Motores del Sur', rubro: 'autos', colorPrincipal: '#14161A', colorSecundario: '#E8590C', whatsapp: '5491155550007', email: 'demo@ejemplo.com', caso: 'Que las consultas lleguen con el auto, la cuota y el usado ya cargados.', creado: '2026-11-09T22:00:00.000Z', ejemplo: true },
   { id: 'r-ejemplo-6', negocio: 'Ferretería El Tornillo Feliz', rubro: 'ferreteria', colorPrincipal: '#E2571E', colorSecundario: '#1F2A44', whatsapp: '5491155550006', email: 'demo@ejemplo.com', caso: 'Contestar rápido las listas que mandan los plomeros por WhatsApp.', creado: '2026-11-09T12:20:00.000Z', ejemplo: true },
