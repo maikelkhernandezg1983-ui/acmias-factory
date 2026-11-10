@@ -24,6 +24,9 @@ import { CatalogoInmo } from '@/components/inmobiliaria/CatalogoInmo';
 import { PanelInmo } from '@/components/inmobiliaria/PanelInmo';
 import { SitioInmo } from '@/components/inmobiliaria/SitioInmo';
 import { PortalCliente } from '@/components/contador/PortalCliente';
+import { HuespedHotel } from '@/components/hotel/HuespedHotel';
+import { PanelHotel } from '@/components/hotel/PanelHotel';
+import { SitioHotel } from '@/components/hotel/SitioHotel';
 import { PanelContador } from '@/components/contador/PanelContador';
 import { SitioContador } from '@/components/contador/SitioContador';
 import { DemoNoEncontrada, useConfigCargada } from './useDemoCargada';
@@ -40,6 +43,7 @@ const VISTAS = {
   autos: { cliente: Concesionaria, panel: PanelAutos, sitio: SitioAutos },
   inmobiliaria: { cliente: CatalogoInmo, panel: PanelInmo, sitio: SitioInmo },
   contador: { cliente: PortalCliente, panel: PanelContador, sitio: SitioContador },
+  hotel: { cliente: HuespedHotel, panel: PanelHotel, sitio: SitioHotel },
 } as const;
 
 /** Abre la pantalla que corresponde al rubro de la demo. */

@@ -8,7 +8,7 @@ import { Icono } from '@/components/Icono';
 import { codificarConfig, formatoPrecio } from '@/lib/utiles';
 import { ETIQUETAS } from '@/lib/tipos';
 
-function Barra({ slug, titulo }: { slug: string; titulo: string }) {
+export function Barra({ slug, titulo }: { slug: string; titulo: string }) {
   return (
     <div className="impr-barra no-print">
       <Link href={`/d/${slug}/panel`} style={{ display: 'inline-flex', alignItems: 'center', gap: 6, minHeight: 44 }}><Icono nombre="atras" /> Volver al panel</Link>
