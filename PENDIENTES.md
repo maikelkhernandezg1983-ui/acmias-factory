@@ -6,11 +6,14 @@ Actualizado: 10 nov 2026. Marcá con [x] lo que se cierre.
 - [ ] **Clave de IA**: cargar `ANTHROPIC_API_KEY` en Vercel (proyecto `acmias-factory` → Settings → Environment Variables) y hacer Redeploy. Activa: importar menú desde foto (restaurante), cargar planilla (repuestos y tienda) y leer fotos de listas (ferretería).
 - [ ] **Base de datos**: en Vercel → Storage → Neon → Create (acepta condiciones y facturación). Después avisar para conectar.
 - [ ] **Dominio**: comprar `acmias.com` (≈ USD 12/año) y apuntarlo a Vercel (nameservers de Vercel para los subdominios `*.demo.acmias.com`).
+- [ ] **Avisos de "Agenda tu demo" por WhatsApp**: Maikel y su esposa activan CallMeBot, cada uno desde su celular, y cargan en Vercel `AVISO_WHATSAPP=5491135726247:CLAVE1;5491122541737:CLAVE2` + Redeploy.
+- [ ] **Avisos por mail**: crear cuenta en resend.com con acmias2026@gmail.com, crear una API key y cargarla en Vercel como `RESEND_API_KEY` + Redeploy.
 - [ ] **Usuarios de vendedores**: sumar uno por vendedor en `/ingresar/generar` y unirlos en `VENDEDORES` con `;`.
 
 ## Lo que hace Claude cuando esté lo anterior
 - [ ] Conectar Neon: guardar registros, demos y estado (catálogo, pedidos, stock, agenda) en la base para que los cambios se vean en todos los dispositivos.
-- [ ] Conectar el formulario "Agenda tu demo" de la landing a `/api/registros` (CORS ya listo).
+- [x] Conectar el formulario "Agenda tu demo" de la landing a `/api/registros`, con aviso por mail y WhatsApp y respaldo por WhatsApp si falla el envío.
+- [ ] Verificación real del mail del cliente por código (se quitó el código de muestra de la landing).
 - [ ] QR de mesa con código único por mesa (hoy el número va en la dirección y se puede cambiar a mano).
 - [ ] Subdominio por demo (`{slug}.demo.acmias.com`) cuando esté el dominio.
 - [ ] Probar la importación con IA real (menú, planillas) con archivos de clientes reales.
