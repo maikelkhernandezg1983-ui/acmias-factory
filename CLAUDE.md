@@ -2,6 +2,8 @@
 
 @AGENTS.md
 
+**Idioma: hablarle siempre en español al fundador** (respuestas, resúmenes, preguntas y textos de la app), aunque las herramientas o los documentos estén en inglés.
+
 Antes de cualquier tarea:
 1. Leé el contexto del proyecto ACMIAS (Proyecto en claude.ai: `01-estrategia/CLAUDE.md`, `08-factory/AGENTES-FACTORY.md`).
 2. Leé el `CLAUDE.md` del rubro en `rubros/<rubro>/CLAUDE.md` y su BRD.
