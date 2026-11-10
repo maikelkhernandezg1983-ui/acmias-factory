@@ -1,6 +1,6 @@
 # Pendientes de ACMIAS Factory
 
-Actualizado: 9 nov 2026. Marcá con [x] lo que se cierre.
+Actualizado: 10 nov 2026. Marcá con [x] lo que se cierre.
 
 ## Lo que tiene que hacer el fundador (necesita su cuenta o sus claves)
 - [ ] **Clave de IA**: cargar `ANTHROPIC_API_KEY` en Vercel (proyecto `acmias-factory` → Settings → Environment Variables) y hacer Redeploy. Activa: importar menú desde foto (restaurante), cargar planilla (repuestos y tienda) y leer fotos de listas (ferretería).
@@ -18,6 +18,7 @@ Actualizado: 9 nov 2026. Marcá con [x] lo que se cierre.
 - [ ] Ferretería: con la clave de IA, probar la lectura de fotos con 20 listas reales del primer cliente antes de activarla (puerta del rubro).
 - [ ] Autos y motos: módulo de fotos reales por vehículo (hoy ilustraciones) y BRD-07 a validar con una agencia real.
 - [ ] Inmobiliaria: fotos reales y recorrido virtual, mapa real; BRD-08 a validar con la inmobiliaria del vendedor (garantías, honorarios y normativa de alquiler de su zona).
+- [ ] Semáforo de stock: hoy los límites son en unidades y valen para todo el negocio. Si un cliente lo pide, sumar límites por categoría (en la ferretería no es lo mismo 3 térmicas que 3 tornillos).
 - [ ] Fotos: restaurante y tienda usan fotos libres de Unsplash; repuestos usa ilustraciones (las fotos libres mostraban marcas reales).
 
 ## Rubros
@@ -29,6 +30,7 @@ Actualizado: 9 nov 2026. Marcá con [x] lo que se cierre.
 - [x] Ferretería (3.100 productos, sinónimos, cotizador desde texto o foto, listas de precios, presupuestos y reposición)
 - [x] Autos y motos (rubro nuevo: stock con ilustraciones, cuota estimada, usado para tasar, prueba de manejo, consultas completas por WhatsApp)
 - [x] Inmobiliaria (rubro nuevo: alquiler, venta y temporario de 8 tipos de propiedad, costo de ingreso estimado, visitas agendadas, captación de propietarios)
+- [x] Semáforo de stock (Tienda, Ferretería y Repuestos): rojo, amarillo y verde en unidades, configurable en Ajustes, con filtro por color en el panel.
 
 ## Antes del Demo Day (4 dic 2026)
 - [ ] Historia clínica real (si se decide hacerla): firma digital, consentimiento, conservación legal por país y contrato de encargado de tratamiento. 🔒 Puerta legal antes del primer consultorio real.

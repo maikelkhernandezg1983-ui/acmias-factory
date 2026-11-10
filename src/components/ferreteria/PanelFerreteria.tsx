@@ -8,9 +8,11 @@ import { leerArchivo } from '@/components/repuestos/ImportadorPlanilla';
 import { actualizarDemo, reiniciarDatos } from '@/lib/almacen';
 import { enlaceWhatsApp, formatoPrecio, soloDigitos } from '@/lib/utiles';
 import { CATEGORIAS, catalogoBase, sinAcentos } from '@/lib/rubros/ferreteria/catalogo';
-import { NOMBRE_TIPO, buscar, estadoStock, faltantes, mensajePresupuesto, mensajeProveedor, mensajeRecordar, sugerido, totalPresupuesto, venceEl, venderPresupuesto } from '@/lib/rubros/ferreteria/logica';
+import { NOMBRE_TIPO, buscar, estadoStock, faltantes, mensajePresupuesto, mensajeProveedor, mensajeRecordar, semaforoFer, sugerido, totalPresupuesto, venceEl, venderPresupuesto } from '@/lib/rubros/ferreteria/logica';
 import type { EstadoFerreteria, Producto, TipoCliente } from '@/lib/rubros/ferreteria/tipos';
 import type { DemoConfig } from '@/lib/tipos';
+import { AjustesSemaforo, LuzStock, ResumenSemaforo } from '@/components/demo/Semaforo';
+import { contarLuces, luz, rangoLuz, NOMBRE_LUZ, type Luz } from '@/lib/semaforo';
 import { Cotizador } from './Cotizador';
 import { useDemoFerreteria, type ActualizarFer } from './useFerreteria';
 
@@ -215,33 +217,42 @@ function Clientes({ config, estado, actualizar }: { config: DemoConfig; estado: 
 
 function Stock({ config, estado, lista, actualizar }: { config: DemoConfig; estado: EstadoFerreteria; lista: Producto[]; actualizar: ActualizarFer }) {
   const [cat, setCat] = useState<string | null>(null);
+  const [luzSel, setLuzSel] = useState<Luz | null>(null);
   const [msg, setMsg] = useState('');
-  const falt = faltantes(lista).filter((p) => !cat || p.categoria === cat);
+  const sem = semaforoFer(estado);
+  const conteo = useMemo(() => contarLuces(lista.map((p) => p.stock), sem), [lista, sem]);
+  const base = luzSel ? lista.filter((p) => luz(p.stock, sem) === luzSel).sort((a, b) => a.stock - b.stock) : faltantes(lista);
+  const falt = base.filter((p) => !cat || p.categoria === cat);
   const muestra = falt.slice(0, 40);
+  const aPedir = muestra.filter((p) => sugerido(p) > 0);
   return (
     <section className="d-card" aria-labelledby="t-stock">
-      <h2 id="t-stock">Stock bajo el mínimo</h2>
-      <p className="sub">{falt.length} productos por debajo del mínimo. El pedido sugerido repone hasta tres veces el mínimo.</p>
+      <h2 id="t-stock">{luzSel ? `Stock en ${NOMBRE_LUZ[luzSel].toLowerCase()} · ${rangoLuz(luzSel, sem)}` : 'Stock bajo el mínimo'}</h2>
+      <ResumenSemaforo conteo={conteo} filtro={luzSel} onFiltro={setLuzSel} />
+      <p className="sub">{luzSel ? `${falt.length.toLocaleString('es')} productos en ${NOMBRE_LUZ[luzSel].toLowerCase()}. Tocá la luz otra vez para volver a los que están bajo el mínimo.` : `${falt.length} productos por debajo del mínimo. El pedido sugerido repone hasta tres veces el mínimo.`}</p>
       <div className="ag-profs" role="group" aria-label="Categoría" style={{ marginBottom: 12 }}>
         <button type="button" aria-pressed={!cat} onClick={() => setCat(null)}>Todas</button>
         {CATEGORIAS.map((c) => <button key={c} type="button" aria-pressed={cat === c} onClick={() => setCat(c)}>{c}</button>)}
       </div>
-      <div className="bar-acciones" style={{ marginBottom: 12 }}>
-        <a className="d-btn prim" href={enlaceWhatsApp(estado.proveedor.whatsapp, mensajeProveedor(muestra.slice(0, 25), config.negocio))} target="_blank" rel="noopener noreferrer"><Icono nombre="whatsapp" size={16} /> Pedir al proveedor ({Math.min(25, muestra.length)})</a>
-        <button type="button" className="d-btn" onClick={() => {
-          const err = actualizar((e) => ({ ...e, stock: { ...e.stock, ...Object.fromEntries(muestra.map((p) => [p.id, p.stock + sugerido(p)])) } }));
-          setMsg(err ?? `Recibiste ${muestra.length} productos: el stock se actualizó.`);
-        }}>Recibir lo sugerido</button>
-      </div>
+      {aPedir.length > 0 && (
+        <div className="bar-acciones" style={{ marginBottom: 12 }}>
+          <a className="d-btn prim" href={enlaceWhatsApp(estado.proveedor.whatsapp, mensajeProveedor(aPedir.slice(0, 25), config.negocio))} target="_blank" rel="noopener noreferrer"><Icono nombre="whatsapp" size={16} /> Pedir al proveedor ({Math.min(25, aPedir.length)})</a>
+          <button type="button" className="d-btn" onClick={() => {
+            const err = actualizar((e) => ({ ...e, stock: { ...e.stock, ...Object.fromEntries(aPedir.map((p) => [p.id, p.stock + sugerido(p)])) } }));
+            setMsg(err ?? `Recibiste ${aPedir.length} productos: el stock se actualizó.`);
+          }}>Recibir lo sugerido</button>
+        </div>
+      )}
       {msg && <p role="status" className="fer-aviso">{msg}</p>}
       <div className="d-scroll">
         <table className="d-tabla">
-          <thead><tr><th>Producto</th><th>Stock</th><th>Mínimo</th><th>Sugerido</th></tr></thead>
+          <thead><tr><th>Producto</th><th>Stock</th><th>Semáforo</th><th>Mínimo</th><th>Sugerido</th></tr></thead>
           <tbody>
             {muestra.map((p) => (
               <tr key={p.id} className={p.stock === 0 ? 'fila-baja' : ''}>
                 <td><strong>{p.nombre}</strong><br /><small>{p.codigo} · {p.linea}</small></td>
                 <td><span className={`fer-stock ${estadoStock(p)}`}>{p.stock} {p.base === 'm' ? 'm' : 'u.'}</span></td>
+                <td><LuzStock stock={p.stock} semaforo={sem} /></td>
                 <td>{p.minimo}</td>
                 <td><strong>{sugerido(p)}</strong></td>
               </tr>
@@ -249,7 +260,8 @@ function Stock({ config, estado, lista, actualizar }: { config: DemoConfig; esta
           </tbody>
         </table>
       </div>
-      {falt.length > muestra.length && <p className="sub" style={{ marginTop: 8 }}>Y {falt.length - muestra.length} más.</p>}
+      {!muestra.length && <p className="tie-vacio">No hay productos acá.</p>}
+      {falt.length > muestra.length && <p className="sub" style={{ marginTop: 8 }}>Y {(falt.length - muestra.length).toLocaleString('es')} más.</p>}
     </section>
   );
 }
@@ -415,6 +427,7 @@ function Sinonimos({ estado, lista, actualizar }: { estado: EstadoFerreteria; li
 function Ajustes({ slug, config, estado, actualizar }: { slug: string; config: DemoConfig; estado: EstadoFerreteria; actualizar: ActualizarFer }) {
   const [msg, setMsg] = useState('');
   return (
+    <>
     <section className="d-card" aria-labelledby="t-aj">
       <h2 id="t-aj">Ajustes de la ferretería</h2>
       <form
@@ -448,6 +461,8 @@ function Ajustes({ slug, config, estado, actualizar }: { slug: string; config: D
         {msg && <p role="status" style={{ margin: 0, fontSize: 14 }}>{msg}</p>}
       </form>
     </section>
+    <AjustesSemaforo semaforo={semaforoFer(estado)} onGuardar={(x) => actualizar((e) => ({ ...e, semaforo: x })) ?? null} ayuda="Definí en unidades (o metros, en cables y caños) cuándo un producto se pinta de rojo, amarillo o verde en Stock y reposición." />
+    </>
   );
 }
 

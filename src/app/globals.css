@@ -14,6 +14,16 @@
   --r-sm: 6px;
   --r-md: 12px;
   --r-lg: 20px;
+  /* Semáforo de stock (texto con contraste AA sobre blanco; foco más vivo). */
+  --sem-rojo: #b42318;
+  --sem-rojo-foco: #e5484d;
+  --sem-rojo-suave: #fdecea;
+  --sem-amarillo: #8a5a00;
+  --sem-amarillo-foco: #f5b800;
+  --sem-amarillo-suave: #fff6d6;
+  --sem-verde: #146c43;
+  --sem-verde-foco: #2fb36b;
+  --sem-verde-suave: #e5f6ec;
 }
 
 *, *::before, *::after { box-sizing: border-box; }
@@ -1195,3 +1205,42 @@ button { cursor: pointer; }
   .in-ciudad .pa-arte, .in-sol, .in-luces .pa-luz { animation: none !important; }
   .in-luces .pa-luz { opacity: 0.92; }
 }
+
+/* ===== Semáforo de stock (Tienda, Ferretería, Repuestos) ===== */
+.sem-luz { display: inline-flex; align-items: center; gap: 6px; font-size: 0.78em; font-weight: 700; white-space: nowrap; }
+.sem-punto { width: 10px; height: 10px; border-radius: 50%; background: currentColor; flex: none; }
+.sem-luz.rojo { color: var(--sem-rojo); }
+.sem-luz.amarillo { color: var(--sem-amarillo); }
+.sem-luz.amarillo .sem-punto { background: var(--sem-amarillo-foco); box-shadow: inset 0 0 0 1px var(--sem-amarillo); }
+.sem-luz.verde { color: var(--sem-verde); }
+.sem-resumen { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin: 4px 0 14px; }
+.sem-chip { display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 14px; border: 2px solid transparent; text-align: left; min-height: 56px; }
+.sem-chip.rojo { background: var(--sem-rojo-suave); color: var(--sem-rojo); }
+.sem-chip.amarillo { background: var(--sem-amarillo-suave); color: var(--sem-amarillo); }
+.sem-chip.verde { background: var(--sem-verde-suave); color: var(--sem-verde); }
+.sem-chip[aria-pressed='true'] { border-color: currentColor; }
+.sem-txt { display: flex; flex-direction: column; min-width: 0; }
+.sem-txt strong { font: 800 1.45em/1 var(--fuente-carta); }
+.sem-txt span { font-size: 0.78em; font-weight: 700; }
+.sem-foco { width: 22px; height: 22px; border-radius: 50%; flex: none; box-shadow: inset 0 -3px 0 rgba(0, 0, 0, 0.18); }
+.rojo > .sem-foco { background: var(--sem-rojo-foco); }
+.amarillo > .sem-foco { background: var(--sem-amarillo-foco); }
+.verde > .sem-foco { background: var(--sem-verde-foco); }
+.sem-chip[aria-pressed='true'] .sem-foco { box-shadow: 0 0 0 4px rgba(255, 255, 255, 0.8), 0 0 12px 2px currentColor; }
+.sem-form { display: grid; gap: 10px; max-width: 520px; }
+.sem-fila { display: grid; grid-template-columns: 22px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 10px 12px; border-radius: 14px; }
+.sem-fila.rojo { background: var(--sem-rojo-suave); }
+.sem-fila.amarillo { background: var(--sem-amarillo-suave); }
+.sem-fila.verde { background: var(--sem-verde-suave); }
+.sem-fila label, .sem-fila > span:nth-child(2) { font-size: 0.95em; }
+.sem-num { display: inline-flex; align-items: center; gap: 6px; font-weight: 700; font-size: 0.92em; }
+.sem-num .c-inp { width: 84px; min-height: 40px; }
+@media (max-width: 480px) {
+  .sem-chip { flex-direction: column; align-items: flex-start; gap: 6px; padding: 10px; }
+  .sem-txt span { font-size: 0.72em; }
+}
+.stock-cab .stock-cab-luz, .stock-cab .sem-luz { flex-direction: row; align-items: center; }
+.stock-cab .stock-cab-luz { gap: 12px; }
+.stock-cab .sem-punto { display: block; }
+.sem-luz.rojo .sem-punto { background: var(--sem-rojo-foco); }
+.sem-luz.verde .sem-punto { background: var(--sem-verde-foco); }

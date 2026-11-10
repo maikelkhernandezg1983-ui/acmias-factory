@@ -1,3 +1,4 @@
+import type { Semaforo } from '@/lib/semaforo';
 /**
  * Ferretería (BRD 06). El catálogo (~3.000 productos) se genera con semilla fija en el dispositivo;
  * el estado guardado solo tiene lo que cambia: precios, stock, sinónimos aprendidos, clientes y presupuestos.
@@ -84,5 +85,7 @@ export interface EstadoFerreteria {
   presupuestos: Presupuesto[];
   proximoNumero: number;
   proveedor: { nombre: string; whatsapp: string };
+  /** Semáforo de stock en unidades (Ajustes). Si falta, se usa el de ejemplo. */
+  semaforo?: Semaforo;
   deshacerPrecios?: Record<string, number>;
 }

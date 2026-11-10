@@ -1,3 +1,4 @@
+import type { Semaforo } from '@/lib/semaforo';
 import { distancia } from '@/lib/rubros/repuestos/logica';
 import { formatoPrecio } from '@/lib/utiles';
 import { COMPLEMENTOS, FAMILIAS, PROBLEMAS, ORDEN_FAMILIA, catalogoBase, familiaDe, preparar, sinAcentos, tokens } from './catalogo';
@@ -286,3 +287,6 @@ export const sugerido = (p: Producto) => Math.max(0, p.minimo * 3 - p.stock);
 export function mensajeProveedor(items: Producto[], negocio: string) {
   return [`Hola, soy de ${negocio}. Te paso el pedido:`, '', ...items.map((p) => `• ${sugerido(p)} ${p.base === 'm' ? 'm' : 'u.'} · ${p.codigo} · ${p.nombre}`), '', 'Gracias.'].join('\n');
 }
+
+export const SEMAFORO_FER: Semaforo = { rojo: 3, amarillo: 10 };
+export const semaforoFer = (e: Pick<EstadoFerreteria, 'semaforo'>) => e.semaforo ?? SEMAFORO_FER;

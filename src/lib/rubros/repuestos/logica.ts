@@ -1,6 +1,7 @@
+import type { Semaforo } from '@/lib/semaforo';
 import { enlaceWhatsApp, formatoPrecio } from '@/lib/utiles';
 import type { DemoConfig } from '@/lib/tipos';
-import type { LineaCotizacion, MiVehiculo, Pieza, Vehiculo } from './tipos';
+import type { EstadoRepuestos, LineaCotizacion, MiVehiculo, Pieza, Vehiculo } from './tipos';
 
 export const normalizar = (t: string) =>
   t
@@ -124,3 +125,6 @@ export function mensajeCotizacion(opts: {
 }
 
 export { enlaceWhatsApp };
+
+export const SEMAFORO_REP: Semaforo = { rojo: 1, amarillo: 5 };
+export const semaforoRep = (e: Pick<EstadoRepuestos, 'semaforo'>) => e.semaforo ?? SEMAFORO_REP;

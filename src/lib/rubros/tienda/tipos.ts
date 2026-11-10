@@ -1,3 +1,4 @@
+import type { Semaforo } from '@/lib/semaforo';
 export type VarianteTienda = 'moda' | 'almacen';
 
 export interface Lote {
@@ -80,5 +81,7 @@ export interface EstadoTienda {
   proveedor: { nombre: string; whatsapp: string };
   coberturaDias: number;
   costoEnvio: number;
+  /** Semáforo de stock en unidades (Ajustes). Si falta, se usa el de ejemplo del rubro. */
+  semaforo?: Semaforo;
   deshacerPrecios?: Record<string, number>;
 }

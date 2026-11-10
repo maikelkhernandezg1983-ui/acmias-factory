@@ -1,3 +1,4 @@
+import type { Semaforo } from '@/lib/semaforo';
 import { formatoPrecio } from '@/lib/utiles';
 import type { DemoConfig } from '@/lib/tipos';
 import type { EstadoTienda, LineaPedido, MedioPago, Movimiento, Origen, PedidoTienda, Producto, Variante } from './tipos';
@@ -167,4 +168,9 @@ export function mensajeProveedor(config: DemoConfig, proveedor: string, filas: {
     '',
     '¿Me confirmás disponibilidad y fecha de entrega? Gracias.',
   ].join('\n');
+}
+
+/** Semáforo de la tienda: el que cargó el dueño o uno de ejemplo según el tipo de tienda. */
+export function semaforoTienda(e: Pick<EstadoTienda, 'semaforo' | 'variante'>): Semaforo {
+  return e.semaforo ?? (e.variante === 'almacen' ? { rojo: 5, amarillo: 12 } : { rojo: 1, amarillo: 4 });
 }

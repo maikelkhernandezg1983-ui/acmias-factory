@@ -7,7 +7,9 @@ import { AvisoDemo, DemoNoEncontrada } from '@/components/demo/useDemoCargada';
 import { actualizarDemo, reiniciarDatos } from '@/lib/almacen';
 import { formatoPrecio, soloDigitos } from '@/lib/utiles';
 import { CATEGORIAS_REP, TALLER_EJEMPLO } from '@/lib/rubros/repuestos/datos-ejemplo';
-import { TEXTO_STOCK, estadoStock, nombreVehiculo } from '@/lib/rubros/repuestos/logica';
+import { TEXTO_STOCK, estadoStock, nombreVehiculo, semaforoRep } from '@/lib/rubros/repuestos/logica';
+import { AjustesSemaforo, LuzStock, ResumenSemaforo } from '@/components/demo/Semaforo';
+import { contarLuces, luz, type Luz } from '@/lib/semaforo';
 import type { EstadoRepuestos, Pieza } from '@/lib/rubros/repuestos/tipos';
 import type { DemoConfig } from '@/lib/tipos';
 import { IconoPieza } from './IconoPieza';
@@ -74,6 +76,8 @@ export function PanelRepuestos({ slug }: { slug: string }) {
 function EditorCatalogo({ estado, actualizar, moneda }: { estado: EstadoRepuestos; actualizar: ActualizarRep; moneda: string }) {
   const [aviso, setAviso] = useState('');
   const [agregando, setAgregando] = useState<string | null>(null);
+  const [filtro, setFiltro] = useState<Luz | null>(null);
+  const sem = semaforoRep(estado);
 
   function cambiar(id: string, cambios: Partial<Pieza>) {
     const err = actualizar((e) => ({ ...e, piezas: e.piezas.map((p) => (p.id === id ? { ...p, ...cambios } : p)) }));
@@ -85,9 +89,10 @@ function EditorCatalogo({ estado, actualizar, moneda }: { estado: EstadoRepuesto
       <h2 id="t-cat">Tu catálogo</h2>
       <p className="sub">Cambiá precio y stock, y sumá una compatibilidad cuando confirmes que una pieza sirve para otro auto: el catálogo aprende.</p>
       <p className="sub" style={{ background: 'var(--c-acento-suave)', padding: '8px 12px', borderRadius: 10 }}>Por ahora los cambios se guardan en este dispositivo. Cuando conectemos la base de datos, se verán en todos los celulares.</p>
+      <ResumenSemaforo conteo={contarLuces(estado.piezas.map((p) => p.stock), sem)} filtro={filtro} onFiltro={setFiltro} unidad="piezas" />
       {aviso && <p role="status" style={{ fontSize: 14 }}>{aviso}</p>}
       {CATEGORIAS_REP.map((c) => {
-        const piezas = estado.piezas.filter((p) => p.categoria === c.id);
+        const piezas = estado.piezas.filter((p) => p.categoria === c.id && (!filtro || luz(p.stock, sem) === filtro));
         if (!piezas.length) return null;
         return (
           <div key={c.id} style={{ marginTop: 18 }}>
@@ -111,6 +116,7 @@ function EditorCatalogo({ estado, actualizar, moneda }: { estado: EstadoRepuesto
                         </td>
                         <td>
                           <label className="sr-only" htmlFor={`st-${p.id}`}>Stock de {p.codigo}</label>
+                          <div style={{ marginBottom: 4 }}><LuzStock stock={p.stock} semaforo={sem} /></div>
                           <input key={`${p.id}-s${p.stock}`} id={`st-${p.id}`} className="d-precio" style={{ width: 80 }} type="number" min={0} step={1} defaultValue={p.stock} onBlur={(e) => { const v = Math.floor(Number(e.target.value)); if (!Number.isFinite(v) || v < 0) { e.target.value = String(p.stock); return; } if (v !== p.stock) cambiar(p.id, { stock: v }); }} />
                           <label style={{ display: 'flex', gap: 6, alignItems: 'center', fontSize: 12, marginTop: 4 }}>
                             <input type="checkbox" checked={p.aPedido} onChange={(e) => cambiar(p.id, { aPedido: e.target.checked })} /> A pedido si no hay
@@ -280,6 +286,7 @@ function Ajustes({ slug, config, estado, actualizar }: { slug: string; config: D
     }
   }
   return (
+    <>
     <section className="d-card" aria-labelledby="t-aj">
       <h2 id="t-aj">Ajustes del local</h2>
       <form onSubmit={(e) => { e.preventDefault(); guardar(e.currentTarget); }} style={{ display: 'grid', gap: 12, maxWidth: 520 }}>
@@ -294,5 +301,7 @@ function Ajustes({ slug, config, estado, actualizar }: { slug: string; config: D
         {msg && <p role="status" style={{ margin: 0, fontSize: 14 }}>{msg}</p>}
       </form>
     </section>
+    <AjustesSemaforo semaforo={semaforoRep(estado)} onGuardar={(x) => actualizar((e) => ({ ...e, semaforo: x }))} ayuda="Definí en unidades cuándo una pieza se pinta de rojo, amarillo o verde en Catálogo y stock. Lo que ve el cliente (Disponible, Pocas unidades, A pedido) no cambia." />
+    </>
   );
 }

@@ -1,3 +1,4 @@
+import type { Semaforo } from '@/lib/semaforo';
 export type CategoriaRep = 'filtros' | 'frenos' | 'encendido' | 'suspension' | 'distribucion' | 'lubricantes';
 
 export interface Vehiculo {
@@ -63,5 +64,7 @@ export interface EstadoRepuestos {
   sinResultado: Record<string, number>;
   /** Descuento de la lista "Taller" en %. */
   descuentoTaller: number;
+  /** Semáforo de stock en unidades (Ajustes). Si falta, se usa el de ejemplo. */
+  semaforo?: Semaforo;
   deshacerPrecios?: Record<string, number>;
 }

@@ -17,12 +17,15 @@ import {
   porVencer,
   reposicion,
   resumenVentas,
+  semaforoTienda,
   stockTotal,
   sumarEntrada,
   topProductos,
 } from '@/lib/rubros/tienda/logica';
 import type { EstadoTienda, Producto } from '@/lib/rubros/tienda/tipos';
 import type { DemoConfig } from '@/lib/tipos';
+import { AjustesSemaforo, LuzStock, ResumenSemaforo } from '@/components/demo/Semaforo';
+import { contarLuces, luz, type Luz, type Semaforo } from '@/lib/semaforo';
 import { FotoProducto } from './FotoProducto';
 import { ImportadorTienda } from './ImportadorTienda';
 import { useDemoTienda, type ActualizarTienda } from './useTienda';
@@ -254,7 +257,14 @@ function Pedidos({ estado, actualizar, moneda }: { estado: EstadoTienda; actuali
 function Stock({ estado, actualizar }: { estado: EstadoTienda; actualizar: ActualizarTienda }) {
   const [msg, setMsg] = useState('');
   const [abierto, setAbierto] = useState<string | null>(null);
+  const [filtro, setFiltro] = useState<Luz | null>(null);
   const almacen = estado.variante === 'almacen';
+  const sem = semaforoTienda(estado);
+  const variantes = estado.productos.flatMap((p) => p.variantes);
+  const conteo = contarLuces(variantes.map((v) => v.stock), sem);
+  const ORDEN: Record<Luz, number> = { rojo: 0, amarillo: 1, verde: 2 };
+  const peor = (p: Producto) => p.variantes.reduce<Luz>((m, v) => (ORDEN[luz(v.stock, sem)] < ORDEN[m] ? luz(v.stock, sem) : m), 'verde');
+  const productos = estado.productos.filter((p) => !filtro || p.variantes.some((v) => luz(v.stock, sem) === filtro));
 
   function cambiar(pid: string, vid: string, campo: 'minimo', valor: number) {
     const err = actualizar((e) => ({ ...e, productos: e.productos.map((p) => (p.id !== pid ? p : { ...p, variantes: p.variantes.map((v) => (v.id === vid ? { ...v, [campo]: valor } : v)) })) }));
@@ -265,13 +275,15 @@ function Stock({ estado, actualizar }: { estado: EstadoTienda; actualizar: Actua
     <section className="d-card" aria-labelledby="t-stock">
       <h2 id="t-stock">Stock y entradas de mercadería</h2>
       <p className="sub">Cada venta y cada pedido confirmado descuentan solos. Acá cargás lo que entra y fijás el mínimo para las alertas.</p>
+      <ResumenSemaforo conteo={conteo} filtro={filtro} onFiltro={setFiltro} unidad={estado.productos.some((p) => p.variantes.length > 1) ? 'variantes' : 'productos'} />
       {msg && <p role="status" style={{ fontSize: 14 }}>{msg}</p>}
-      {estado.productos.map((p) => (
+      {!productos.length && <p className="tie-vacio">Ningún producto en esta luz.</p>}
+      {productos.map((p) => (
         <div key={p.id} className="stock-prod">
           <button type="button" className="stock-cab" aria-expanded={abierto === p.id} onClick={() => setAbierto((x) => (x === p.id ? null : p.id))}>
             <Mini p={p} />
             <span><strong>{p.nombre}</strong><span>{p.categoria} · {p.variantes.length > 1 ? `${p.variantes.length} variantes · ` : ''}stock {stockTotal(p)}</span></span>
-            <Icono nombre={abierto === p.id ? 'menos' : 'mas'} size={18} />
+            <span className="stock-cab-luz"><LuzStock stock={p.variantes.find((v) => luz(v.stock, sem) === peor(p))?.stock ?? 0} semaforo={sem} /><Icono nombre={abierto === p.id ? 'menos' : 'mas'} size={18} /></span>
           </button>
           {abierto === p.id && (
             <div className="d-scroll">
@@ -279,7 +291,7 @@ function Stock({ estado, actualizar }: { estado: EstadoTienda; actualizar: Actua
                 <thead><tr><th>Variante</th><th>Código</th><th>Stock</th><th>Mínimo</th><th>Entrada</th></tr></thead>
                 <tbody>
                   {p.variantes.map((v) => (
-                    <FilaVariante key={v.id} p={p} v={v} almacen={almacen} onMinimo={(n) => cambiar(p.id, v.id, 'minimo', n)} onEntrada={(n, vence) => {
+                    <FilaVariante key={v.id} p={p} v={v} almacen={almacen} semaforo={sem} onMinimo={(n) => cambiar(p.id, v.id, 'minimo', n)} onEntrada={(n, vence) => {
                       const err = actualizar((e) => sumarEntrada(e, p.id, v.id, n, vence));
                       setMsg(err ?? `Entraron ${n} de ${p.nombre}${p.variantes.length > 1 ? ` (${detalleVariante(v)})` : ''}.`);
                     }} />
@@ -294,7 +306,7 @@ function Stock({ estado, actualizar }: { estado: EstadoTienda; actualizar: Actua
   );
 }
 
-function FilaVariante({ p, v, almacen, onMinimo, onEntrada }: { p: Producto; v: Producto['variantes'][number]; almacen: boolean; onMinimo: (n: number) => void; onEntrada: (n: number, vence?: string) => void }) {
+function FilaVariante({ p, v, almacen, semaforo, onMinimo, onEntrada }: { p: Producto; v: Producto['variantes'][number]; almacen: boolean; semaforo: Semaforo; onMinimo: (n: number) => void; onEntrada: (n: number, vence?: string) => void }) {
   const [n, setN] = useState(0);
   const [vence, setVence] = useState('');
   const nombre = `${p.nombre} ${detalleVariante(v)}`;
@@ -302,7 +314,7 @@ function FilaVariante({ p, v, almacen, onMinimo, onEntrada }: { p: Producto; v: 
     <tr className={v.stock <= v.minimo ? 'fila-baja' : ''}>
       <td>{detalleVariante(v)}{v.lotes?.length ? <div style={{ fontSize: 12, color: '#55555f' }}>{v.lotes.filter((l) => l.cantidad > 0).map((l) => `${l.cantidad} vence ${l.vence.slice(8)}/${l.vence.slice(5, 7)}`).join(' · ')}</div> : null}</td>
       <td><code style={{ fontSize: 12 }}>{v.codigoBarras}</code></td>
-      <td><strong>{v.stock}</strong></td>
+      <td><strong>{v.stock}</strong> <LuzStock stock={v.stock} semaforo={semaforo} /></td>
       <td>
         <label className="sr-only" htmlFor={`mi-${v.id}`}>Mínimo de {nombre}</label>
         <input key={`${v.id}-${v.minimo}`} id={`mi-${v.id}`} className="d-precio" style={{ width: 70 }} type="number" min={0} defaultValue={v.minimo} onBlur={(e) => { const x = Math.floor(Number(e.target.value)); if (Number.isFinite(x) && x >= 0 && x !== v.minimo) onMinimo(x); }} />
@@ -441,6 +453,7 @@ function Precios({ estado, actualizar, moneda }: { estado: EstadoTienda; actuali
 function Ajustes({ slug, config, estado, actualizar }: { slug: string; config: DemoConfig; estado: EstadoTienda; actualizar: ActualizarTienda }) {
   const [msg, setMsg] = useState('');
   return (
+    <>
     <section className="d-card" aria-labelledby="t-aj">
       <h2 id="t-aj">Ajustes de la tienda</h2>
       <form
@@ -482,5 +495,7 @@ function Ajustes({ slug, config, estado, actualizar }: { slug: string; config: D
         {msg && <p role="status" style={{ margin: 0, fontSize: 14 }}>{msg}</p>}
       </form>
     </section>
+    <AjustesSemaforo semaforo={semaforoTienda(estado)} onGuardar={(s) => actualizar((x) => ({ ...x, semaforo: s })) ?? null} ayuda="Definí en unidades cuándo cada talle, color o producto se pinta de rojo, amarillo o verde en Stock y entradas." />
+    </>
   );
 }
