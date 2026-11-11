@@ -66,14 +66,19 @@ export function alertasStock(productos: Producto[]) {
 }
 
 export function porVencer(productos: Producto[], dias = 7) {
-  const limite = new Date(Date.now() + dias * DIA).toISOString().slice(0, 10);
+  const d = new Date();
+  d.setDate(d.getDate() + dias);
+  const limite = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   return productos.flatMap((p) =>
     p.variantes.flatMap((v) => (v.lotes ?? []).filter((l) => l.cantidad > 0 && l.vence <= limite).map((l) => ({ producto: p, variante: v, lote: l }))),
   );
 }
 
+/** Días de calendario entre hoy y la fecha (hora local). */
 export function diasHasta(fecha: string) {
-  return Math.round((new Date(`${fecha}T12:00:00`).getTime() - Date.now()) / DIA);
+  const hoy = new Date();
+  hoy.setHours(0, 0, 0, 0);
+  return Math.round((new Date(`${fecha}T00:00:00`).getTime() - hoy.getTime()) / DIA);
 }
 
 /** Promedio de unidades vendidas por día en las últimas 4 semanas. */

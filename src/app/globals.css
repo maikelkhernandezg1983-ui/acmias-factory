@@ -1472,3 +1472,71 @@ button { cursor: pointer; }
   .ho-pasos li[aria-current='step']::before { animation: none; }
   .ho-mosaico { transition: none; }
 }
+
+/* ===== Colegio (BRD 11) ===== */
+.co-lista { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; }
+.co-lista li { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 8px 4px; border-bottom: 1px solid #ebe9e3; }
+.co-lista li.p-ausente { background: var(--sem-rojo-suave); }
+.co-lista li.p-tarde { background: var(--sem-amarillo-suave); }
+.co-nombre { font-weight: 600; min-width: 0; }
+.co-seg { display: inline-flex; border-radius: 12px; border: 1px solid #dcdad3; overflow: hidden; flex: none; }
+.co-seg button { width: 48px; height: 44px; border: 0; background: #fff; font: inherit; font-weight: 800; cursor: pointer; color: #45483f; }
+.co-seg button + button { border-left: 1px solid #dcdad3; }
+.co-seg button[aria-pressed='true']:nth-child(1) { background: var(--sem-verde-foco); color: #fff; }
+.co-seg button[aria-pressed='true']:nth-child(2) { background: var(--sem-rojo); color: #fff; }
+.co-seg button[aria-pressed='true']:nth-child(3) { background: var(--sem-amarillo-foco); color: #1b1d1a; }
+.co-form { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+.co-form label { display: grid; gap: 6px; font-weight: 700; font-size: 14px; }
+.co-form .ancho { grid-column: 1 / -1; }
+.co-check { display: flex !important; align-items: center; gap: 8px; font-weight: 600 !important; }
+.co-cursos { border: 0; padding: 0; margin: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+.co-cursos legend { font-weight: 700; font-size: 14px; margin-bottom: 6px; }
+.co-cursos label { display: inline-flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 999px; border: 1px solid #dcdad3; font-weight: 600; cursor: pointer; }
+.co-items { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.co-items > li { padding: 14px; border-radius: 16px; background: #f8f7f3; }
+.co-item-cab { display: flex; justify-content: space-between; gap: 12px; flex-wrap: wrap; align-items: flex-start; }
+.co-item-cab > div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.co-item-cab span { font-size: 13px; color: #5d6159; }
+.co-pct { font-size: 13px !important; font-weight: 700; color: var(--c-marca-texto) !important; }
+.co-items .ct-progreso { margin-top: 10px; }
+.co-barra { display: flex; height: 10px; border-radius: 999px; overflow: hidden; background: #e3e1da; margin-top: 10px; }
+.co-barra .si { background: var(--sem-verde-foco); }
+.co-barra .no { background: var(--sem-rojo-foco); }
+.co-hecho { display: block; font-size: 12px; font-weight: 700; color: var(--sem-verde); }
+.co-beca { min-height: 36px; width: auto; }
+.co-vacantes { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 8px; }
+.co-vacantes div { display: flex; flex-direction: column; gap: 2px; padding: 12px; border-radius: 14px; background: var(--sem-verde-suave); color: var(--sem-verde); }
+.co-vacantes div.pocas { background: var(--sem-amarillo-suave); color: var(--sem-amarillo); }
+.co-vacantes div.lleno { background: var(--sem-rojo-suave); color: var(--sem-rojo); }
+.co-vacantes strong { font-size: 26px; font-variant-numeric: tabular-nums; line-height: 1; }
+.co-vacantes span { font-size: 13px; font-weight: 700; }
+.co-importar { margin-top: 14px; padding: 14px; border-radius: 16px; background: #f8f7f3; }
+.co-hijos { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px; }
+.co-hijos div { display: flex; flex-direction: column; gap: 2px; padding: 12px 14px; border-radius: 16px; background: var(--c-marca); color: var(--c-sobre-marca); }
+.co-hijos strong { font-size: 18px; }
+.co-hijos span { font-size: 13px; opacity: 0.9; }
+.co-pendiente { margin: 0; padding: 12px 14px; border-radius: 14px; background: var(--sem-amarillo-suave); color: var(--sem-amarillo); font-weight: 700; }
+.co-aut { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.co-aut li { display: flex; flex-direction: column; gap: 4px; padding: 12px; border-radius: 14px; background: #f8f7f3; }
+.co-aut li > span { font-size: 13px; color: #5d6159; }
+.co-sino { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.co-sino button { min-height: 48px; border-radius: 12px; border: 1px solid #dcdad3; background: #fff; font: inherit; font-weight: 800; cursor: pointer; color: inherit; }
+.co-sino button[aria-pressed='true']:first-child { background: var(--sem-verde-foco); border-color: var(--sem-verde-foco); color: #fff; }
+.co-sino button[aria-pressed='true']:last-child { background: var(--sem-rojo); border-color: var(--sem-rojo); color: #fff; }
+.co-coms { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.co-coms li { border-radius: 14px; background: #f8f7f3; overflow: hidden; }
+.co-coms li.nuevo { box-shadow: inset 4px 0 0 var(--c-acento); }
+.co-coms button { width: 100%; display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 14px; border: 0; background: none; font: inherit; text-align: left; cursor: pointer; color: inherit; min-height: 56px; }
+.co-coms button > span { display: flex; flex-direction: column; gap: 2px; }
+.co-coms small { font-size: 12px; color: #5d6159; }
+.co-coms li.nuevo small { color: var(--c-marca-texto); font-weight: 700; }
+.co-coms p { margin: 0; padding: 0 14px 14px; font-size: 14px; line-height: 1.5; }
+.co-faltas + .co-faltas { margin-top: 12px; }
+.co-faltas ul { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
+.co-faltas li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; font-size: 14px; padding: 8px 10px; border-radius: 12px; background: #f8f7f3; }
+.co-justif { display: flex; gap: 6px; width: 100%; }
+.co-justif .c-inp { flex: 1; min-width: 0; }
+.co-pre { max-width: 720px; }
+@media (max-width: 640px) {
+  .co-form { grid-template-columns: 1fr; }
+}

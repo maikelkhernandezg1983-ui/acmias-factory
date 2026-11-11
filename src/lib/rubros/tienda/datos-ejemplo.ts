@@ -83,7 +83,12 @@ const ALMACEN: Def[] = [
   { nombre: 'Manteca 200 g', categoria: 'Lácteos', base: 2.4, icono: 'lacteo', rotacion: 4, minimo: 4, stock: () => 6, vencimientos: [-1, 25] },
 ];
 
-const diaISO = (dias: number) => new Date(Date.now() + dias * 86_400_000).toISOString().slice(0, 10);
+/** Fecha local (AAAA-MM-DD) a `dias` días de hoy: con la fecha UTC, cerca de medianoche se corría un día. */
+const diaISO = (dias: number) => {
+  const d = new Date();
+  d.setDate(d.getDate() + dias);
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
 
 export function crearEstadoTienda(moneda: string, variante: VarianteTienda = 'moda'): EstadoTienda {
   const defs = variante === 'almacen' ? ALMACEN : MODA;

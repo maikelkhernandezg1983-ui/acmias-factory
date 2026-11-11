@@ -16,8 +16,10 @@ import { crearEstadoAutos } from './rubros/autos/datos-ejemplo';
 import { crearEstadoInmo } from './rubros/inmobiliaria/datos-ejemplo';
 import { crearEstadoContador } from './rubros/contador/datos-ejemplo';
 import { crearEstadoHotel } from './rubros/hotel/datos-ejemplo';
+import { crearEstadoColegio } from './rubros/colegio/datos-ejemplo';
 
 function estadoInicial(config: DemoConfig): unknown {
+  if (config.rubro === 'colegio') return crearEstadoColegio(config.moneda);
   if (config.rubro === 'hotel') return crearEstadoHotel(config.moneda);
   if (config.rubro === 'contador') return crearEstadoContador(config.moneda);
   if (config.rubro === 'inmobiliaria') return crearEstadoInmo(config.moneda);

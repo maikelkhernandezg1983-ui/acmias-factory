@@ -23,6 +23,7 @@ Actualizado: 10 nov 2026. Marcá con [x] lo que se cierre.
 - [ ] Inmobiliaria: fotos reales y recorrido virtual, mapa real; BRD-08 a validar con la inmobiliaria del vendedor (garantías, honorarios y normativa de alquiler de su zona).
 - [ ] Estudio contable: validar BRD-09 con el contador (columnas de su Excel, tareas por mes, vencimientos). 🔒 Antes del primer estudio real: claves fiscales cifradas, permisos y registro de quién las ve, revisión legal de la custodia.
 - [ ] Hotel: validar BRD-10 con un hotel real (llamadas por día, áreas, room service, sistema de reservas). Con la base de datos, el pedido del huésped llega al panel en otro dispositivo; sumar aviso sonoro y por WhatsApp al personal de cada área.
+- [ ] Colegio: validar BRD-11 con un colegio real (comunicados, autorizaciones, cuotas, becas). 🔒 Antes del primer colegio real: revisión legal de datos de menores y consentimiento de los responsables.
 - [ ] Semáforo de stock: hoy los límites son en unidades y valen para todo el negocio. Si un cliente lo pide, sumar límites por categoría (en la ferretería no es lo mismo 3 térmicas que 3 tornillos).
 - [ ] Fotos: restaurante y tienda usan fotos libres de Unsplash; repuestos usa ilustraciones (las fotos libres mostraban marcas reales).
 
@@ -37,10 +38,11 @@ Actualizado: 10 nov 2026. Marcá con [x] lo que se cierre.
 - [x] Inmobiliaria (rubro nuevo: alquiler, venta y temporario de 8 tipos de propiedad, costo de ingreso estimado, visitas agendadas, captación de propietarios)
 - [x] Estudio contable (rubro nuevo: importación de 280 clientes desde Excel, claves con ojito y registro, historial de pagos con confirmación manual, tareas del mes en orden con aviso por WhatsApp, deudas y tablero de ingresos)
 - [x] Hotelería (rubro nuevo, idea de Marilyn: QR por habitación para room service, limpieza, mantenimiento y recepción sin llamar; pedidos por área; habitaciones; check-in y check-out con la cuenta por WhatsApp; hoja de QR)
+- [x] Colegio (rubro nuevo: comunicados con confirmación de lectura, autorizaciones con un toque, asistencia desde el celular, cuotas por familia con hermanos y becas, importación de alumnos, preinscripción y portal de familias)
 - [x] Semáforo de stock (Tienda, Ferretería y Repuestos): rojo, amarillo y verde en unidades, configurable en Ajustes, con filtro por color en el panel.
 
 ## Antes del Demo Day (4 dic 2026)
 - [ ] Historia clínica real (si se decide hacerla): firma digital, consentimiento, conservación legal por país y contrato de encargado de tratamiento. 🔒 Puerta legal antes del primer consultorio real.
-- [ ] Revisión de código y seguridad completa (agentes de QA) sobre los 6 rubros.
+- [ ] Revisión de código y seguridad completa (agentes de QA) sobre los 11 rubros.
 - [ ] Prueba en celulares reales (Android y iPhone), incluido el lector de códigos por cámara.
 - [ ] Guiones de 5 minutos ensayados (están en `docs/demos/`).

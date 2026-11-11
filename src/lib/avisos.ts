@@ -24,6 +24,7 @@ export const NOMBRE_RUBRO_AVISO: Record<Registro['rubro'], string> = {
   inmobiliaria: 'Inmobiliaria',
   contador: 'Estudio contable',
   hotel: 'Hotel',
+  colegio: 'Colegio',
 };
 
 export function textoAviso(r: Registro, rubroIndicado?: string) {

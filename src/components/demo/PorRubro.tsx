@@ -25,6 +25,9 @@ import { PanelInmo } from '@/components/inmobiliaria/PanelInmo';
 import { SitioInmo } from '@/components/inmobiliaria/SitioInmo';
 import { PortalCliente } from '@/components/contador/PortalCliente';
 import { HuespedHotel } from '@/components/hotel/HuespedHotel';
+import { PortalFamilias } from '@/components/colegio/PortalFamilias';
+import { PanelColegio } from '@/components/colegio/PanelColegio';
+import { SitioColegio } from '@/components/colegio/SitioColegio';
 import { PanelHotel } from '@/components/hotel/PanelHotel';
 import { SitioHotel } from '@/components/hotel/SitioHotel';
 import { PanelContador } from '@/components/contador/PanelContador';
@@ -44,6 +47,7 @@ const VISTAS = {
   inmobiliaria: { cliente: CatalogoInmo, panel: PanelInmo, sitio: SitioInmo },
   contador: { cliente: PortalCliente, panel: PanelContador, sitio: SitioContador },
   hotel: { cliente: HuespedHotel, panel: PanelHotel, sitio: SitioHotel },
+  colegio: { cliente: PortalFamilias, panel: PanelColegio, sitio: SitioColegio },
 } as const;
 
 /** Abre la pantalla que corresponde al rubro de la demo. */
